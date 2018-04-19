@@ -10,6 +10,7 @@ import java.awt.Graphics;
 import java.awt.event.MouseWheelEvent;
 import java.awt.event.MouseWheelListener;
 import java.util.ArrayList;
+import java.util.Arrays;
 import javax.swing.JPanel;
 
 /**
@@ -20,7 +21,7 @@ public class Map extends JPanel {
     
     private ArrayList<Obstacle> obstacles;
     private ArrayList<Line> lines;
-    private double scale = 1.0;
+    private final double scale = 1.0;
     Robot r;
     
     public Map() {
@@ -54,20 +55,6 @@ public class Map extends JPanel {
         
     }
     
-    private static class Robot {
-        
-        final int diameter;
-        int x;
-        int y;
-        
-        public Robot() {
-            diameter = 33;
-            x = 0;
-            y = 0;
-        }
-        
-    }
-    
     private static class Line {
         
         final int x1;
@@ -84,19 +71,18 @@ public class Map extends JPanel {
         
     }
     
-    private void addObstacle(double distance, double angleThroughCenter, double diameter) {
+    public void addObstacle(double distance, double angleThroughCenter, double diameter) {
         obstacles.add(new Obstacle(distance, angleThroughCenter, diameter));
         repaint();
     }
     
-    private void addLine(int x1, int y1, int x2, int y2) {
+    public void addLine(int x1, int y1, int x2, int y2) {
         lines.add(new Line(x1, y1, x2, y2));
         repaint();
     }
     
-    private void moveRobot(int x, int y) { // moves origin since robot is always at origin
-        r.x = x;
-        r.y = y;
+    public void moveRobot(int x, int y) { // moves origin since robot is always at origin
+        r.setPosition(x, y);
         repaint();
     }
     
@@ -124,13 +110,17 @@ public class Map extends JPanel {
         }
         
         for (Obstacle obstacle : obstacles) {
-            int[] adjusted = getAdjustedObstacleCoords(obstacle, r.x, r.y);
+            int[] adjusted = getAdjustedObstacleCoords(obstacle, r.getPosition()[0], r.getPosition()[1]);
             g.drawOval(getOvalCoords(adjusted[0], adjusted[1], obstacle.diameter)[0], getOvalCoords(adjusted[0], adjusted[1], obstacle.diameter)[1], obstacle.diameter, obstacle.diameter);
         }
         
         // draw robot
-        g.drawOval(getOvalCoords(r.x, r.y, r.diameter)[0], getOvalCoords(r.x, r.y, r.diameter)[1], r.diameter, r.diameter);
-        moveRobot(getWidth() / 2, getHeight() / 2);
+        g.drawOval(
+                getOvalCoords(r.getPosition()[0], r.getPosition()[1], r.getDiameter())[0], 
+                getOvalCoords(r.getPosition()[0], r.getPosition()[1], r.getDiameter())[1], 
+                r.getDiameter(), 
+                r.getDiameter()
+        );
     }
     
 }

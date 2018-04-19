@@ -32,11 +32,12 @@ public class NetUtils extends Thread {
     private String ip;
     private int port;
     private JFrame parent;
-    private boolean isConnected;
+    private Socket socket;
+    private InputStreamReader isr;
     
     public NetUtils(JFrame parent) {
         this.parent = parent;
-        isConnected = false;
+        isr = null;
         ip = null;
         port = 0;
     }
@@ -47,28 +48,21 @@ public class NetUtils extends Thread {
         this.port = port;
     }
 
+    /**
+     * Invoked with Thread.start() method.  Initializes socket at specified IP and port and stream readers and writers.
+     */
     @Override
     public void run() {
-        try (Socket socket = new Socket();) {
-            socket.connect(new InetSocketAddress(ip, port));
+        try {
+            socket = new Socket();
+            socket.connect(new InetSocketAddress(ip, port), 500);
             System.out.println("Socket connected " + socket);
             
+            isr = new InputStreamReader(socket.getInputStream());
+            
             DataOutputStream os = new DataOutputStream(socket.getOutputStream());
-            
-//            int counter = 0;
-            
             ActivityLogWriter writer = new ActivityLogWriter();
             
-            // endlessly receieve infp from robot
-            try (InputStreamReader isr = new InputStreamReader(socket.getInputStream())) {
-                while (true) {
-                    writer.logPrintln(readLine(isr));
-//                    Window.getActivityLog().append("Robot: " + readLine(socket, isr) + "\n");
-                }
-            } catch (IOException e) {
-                JOptionPane.showMessageDialog(parent, "Could not connect!\nCheck your IP and port.", "IOException", JOptionPane.ERROR_MESSAGE);
-            }
-            socket.close();
         } catch (SocketTimeoutException e) {
             JOptionPane.showMessageDialog(parent, "Connection timed out!\nCheck your IP and port.", "SocketTimeoutException", JOptionPane.ERROR_MESSAGE);
             
@@ -77,17 +71,32 @@ public class NetUtils extends Thread {
         }
     }
     
-    private void sendLine() {
+    /**
+     * Returns field socket
+     * @return socket
+     */
+    public Socket getSocket() {
+        return socket;
+    }
+    
+    /**
+     * Closes socket and InputStreamReader
+     * @throws IOException 
+     */
+    public void closeSocket() throws IOException {
+        isr.close();
+        socket.close();
+    }
+    
+    public void sendLine() {
 
     }
 
     /**
      * Reads byte stream from socket and filters into a string
-     *
-     * @param socket The socket used to pass in the stream
      * @return String from byte stream
      */
-    private String readLine(InputStreamReader isr) {
+    public String readLine() {
 
         String line;
         boolean isDone = false;
@@ -111,14 +120,18 @@ public class NetUtils extends Thread {
         return line;
     }
     
-    public boolean isConnected() {
-        return isConnected;
-    }
-    
+    /**
+     * Sets IP for socket
+     * @param ip IP number for socket to connect to
+     */
     public void setIP(String ip) {
         this.ip = ip;
     }
     
+    /**
+     * Sets port for socket
+     * @param port Port number for socket to connect through
+     */
     public void setPort(int port) {
         this.port = port;
     }

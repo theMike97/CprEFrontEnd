@@ -45,7 +45,9 @@ public class ConnectionDialog extends JDialog {
         okBtn = new JButton("OK");
         cancelBtn = new JButton("Cancel");
         ipTextField = new JTextField(10);
+        ipTextField.setText("192.168.1.1");
         portTextField = new JTextField(5);
+        portTextField.setText("288");
         ipLabel = new JLabel("IP:Port");
         portLabel = new JLabel(":");
 

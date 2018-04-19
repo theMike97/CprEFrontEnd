@@ -13,9 +13,12 @@ import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.IOException;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import javax.swing.filechooser.FileNameExtensionFilter;
+import javax.swing.text.BadLocationException;
 import javax.swing.text.DefaultCaret;
 
 /**
@@ -36,12 +39,7 @@ public class Window extends JFrame {
     private JPanel bottomRotatePanel;
     private JLabel calibrationLabel;
     private JPanel centerOrientationPanel;
-    private JMenuItem cmEditConnectionItem;
-    private JMenuItem cmConnectItem;
-    private JMenu connectMenu;
-    private JLabel connectStatusLabel;
-    private static String STATUS_CONNECTED = "Connected";
-    private static String STATUS_DISCONNECTED = "Disconnected";
+    private JButton connectBtn;
     private JPanel contentPanel;
     private JPanel controlsPanel;
     private JMenu editMenu;
@@ -87,11 +85,11 @@ public class Window extends JFrame {
     private final static int EAST = 1;
     private final static int SOUTH = 2;
     private final static int WEST = 3;
-    
+
 //    private final static String IP = "192.168.1.1";
 //    private final static int PORT = 288;
-    
     private NetUtils comms;
+    private ActivityLogWriter writer;
 
     private int currentDirection;
     protected CalibrationProfile calibrationProfile;
@@ -153,21 +151,17 @@ public class Window extends JFrame {
         runMenu = new JMenu();
         rmRunMenuItem = new JMenuItem();
         rmRestartMenuItem = new JMenuItem();
-        connectMenu = new JMenu();
-        cmEditConnectionItem = new JMenuItem();
-        cmConnectItem = new JMenuItem();
-        connectStatusLabel = new JLabel();
+        connectBtn = new JButton();
         scanBtn = new JButton();
 
         comms = new NetUtils(this); // start socket thread
-        
+        writer = new ActivityLogWriter();
+
         currentDirection = 0;
         calibrationProfile = new CalibrationProfile();
         hasProfile = false;
         // </editor-fold>
 
-//        comms.setDaemon(true);
-//        comms.start();
         createWindow();
     }
 
@@ -180,8 +174,15 @@ public class Window extends JFrame {
         setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);
         addWindowListener(new WindowAdapter() {
             @Override
-            public void  windowClosing(WindowEvent evt) {
-                comms.interrupt();
+            public void windowClosing(WindowEvent evt) {
+                if (comms.isAlive() && comms.getSocket() != null) {
+                    try {
+                        comms.closeSocket();
+                        comms.interrupt();
+                    } catch (IOException ex) {
+                        ex.printStackTrace();
+                    }
+                }
             }
         });
         setTitle("Team N2 iRobot Front End");
@@ -237,13 +238,13 @@ public class Window extends JFrame {
         }
         calibrationLabel.setText("Calibration Profile: " + profileName);
         CalibrationPanel.add(calibrationLabel);
-        
-        connectStatusLabel.setText("Connection Status: " + STATUS_DISCONNECTED);
-        connectStatusLabel.setForeground(Color.red);
-        CalibrationPanel.add(connectStatusLabel);
-        
+
+        connectBtn.setText("Connect");
+        connectBtn.addActionListener(this::connectBtnActionPerformed);
+        CalibrationPanel.add(connectBtn);
+
         scanConnectPanel.setLayout(new FlowLayout());
-        
+
         scanBtn.setText("Scan");
         scanBtn.addActionListener(this::scanBtnActionPerformed);
         scanConnectPanel.add(scanBtn);
@@ -483,7 +484,7 @@ public class Window extends JFrame {
         logLabelPanel.add(logLabel);
 
         activityLogTextArea.setEditable(false);
-        DefaultCaret caret = (DefaultCaret)activityLogTextArea.getCaret();
+        DefaultCaret caret = (DefaultCaret) activityLogTextArea.getCaret();
         caret.setUpdatePolicy(DefaultCaret.ALWAYS_UPDATE);
 
         activityLogScrollPane.setViewportView(activityLogTextArea);
@@ -591,18 +592,6 @@ public class Window extends JFrame {
         rmRestartMenuItem.setText("Restart");
         rmRestartMenuItem.addActionListener(this::rmRestartMenuItemActionPerformed);
         runMenu.add(rmRestartMenuItem);
-        
-        connectMenu.setText("Connect");
-        menuBar.add(connectMenu);
-        
-        cmEditConnectionItem.setText("Edit Connection");
-        cmEditConnectionItem.addActionListener(this::cmEditConnectionItemActionPerformed);
-        connectMenu.add(cmEditConnectionItem);
-        
-        cmConnectItem.setText("Connection");
-        cmConnectItem.addActionListener(this::cmConnectItemActionPerformed);
-        connectMenu.add(cmConnectItem);
-        
 
         setJMenuBar(menuBar);
 
@@ -618,6 +607,9 @@ public class Window extends JFrame {
         );
 
         pack();
+        
+        // init robot position to center of map
+        mapPanel.moveRobot(mapPanel.getWidth() / 2, mapPanel.getHeight() / 2);
     }
 // </editor-fold>                        
 
@@ -647,7 +639,7 @@ public class Window extends JFrame {
             File file = fc.getSelectedFile();
 
             loadProfile(file);
-            activityLogTextArea.append("Loaded calibration profile \"" + calibrationProfile.getName() + "\"\n");
+            writer.logPrintln("Loaded calibration profile \"" + calibrationProfile.getName() + "\"");
         }
     }
 
@@ -670,7 +662,7 @@ public class Window extends JFrame {
             calibrationProfile = cDialog.getCalibrationProfile();
 
             loadProfile(file);
-            activityLogTextArea.append("Updated profile" + "\"" + profileName + "\"\n");
+            writer.logPrintln("Updated profile" + "\"" + profileName + "\"");
         }
     }
 
@@ -679,8 +671,8 @@ public class Window extends JFrame {
         cDialog.createDialog();
         calibrationProfile = cDialog.getCalibrationProfile();
         loadProfile(calibrationProfile);
-        activityLogTextArea.append("Created calibration profile \"" + calibrationProfile.getName() + "\"\n");
-        activityLogTextArea.append("Loaded calibration profile \"" + calibrationProfile.getName() + "\"\n");
+        writer.logPrintln("Created calibration profile \"" + calibrationProfile.getName() + "\"");
+        writer.logPrintln("Loaded calibration profile \"" + calibrationProfile.getName() + "\"");
     }
 
     private void exitMenuItemActionPerformed(ActionEvent evt) {
@@ -688,57 +680,62 @@ public class Window extends JFrame {
     }
 
     private void emProfileDirectoryMenuItemActionPerformed(ActionEvent evt) {
-        
+
     }
 
     private void rmRunMenuItemActionPerformed(ActionEvent evt) {
-        
+
     }
 
     private void rmRestartMenuItemActionPerformed(ActionEvent evt) {
 
     }
-    
-    private void cmEditConnectionItemActionPerformed(ActionEvent evt) {
+
+    private void connectBtnActionPerformed(ActionEvent evt) {
         ConnectionDialog cd = new ConnectionDialog(this);
         cd.createDialog();
         String ip = cd.getIP();
         int port = cd.getPort();
-//        System.out.println(ip + ":" + port);
-        comms.setIP(ip);
-        comms.setPort(port);
-        comms.start();
+        if (ip != null) {
+            comms.setIP(ip);
+            comms.setPort(port);
+            comms.start();
+        }
     }
-    
-    private void cmConnectItemActionPerformed(ActionEvent evt) {
-        
-    }
-    
+
     private void scanBtnActionPerformed(ActionEvent evt) {
-        
+        if (!comms.isAlive()) {
+            JOptionPane.showMessageDialog(this, "Not connected to iRobot", "NullPointerException", JOptionPane.WARNING_MESSAGE);
+            return;
+        }
+        String line;
+        while ((line = comms.readLine()) == "") {
+            // wait until there is a line to read
+        }
+        writer.logPrintln(line);
     }
 
     private void topRotateBtnActionPerformed(ActionEvent evt) {
         robotOrientationImage.setIcon(new ImageIcon(getClass().getResource("/cprefrontend/robot-orientation-north.png")));
-        activityLogTextArea.append("Sending command \"rotate(" + getDirection(currentDirection, NORTH) + ")\"\n");
+        writer.logPrintln("Sending command \"rotate(" + getDirection(currentDirection, NORTH) + ")\"");
         currentDirection = NORTH;
     }
 
     private void rightRotateBtnActionPerformed(ActionEvent evt) {
         robotOrientationImage.setIcon(new ImageIcon(getClass().getResource("/cprefrontend/robot-orientation-east.png")));
-        activityLogTextArea.append("Sending command \"rotate(" + getDirection(currentDirection, EAST) + ")\"\n");
+        writer.logPrintln("Sending command \"rotate(" + getDirection(currentDirection, EAST) + ")\"");
         currentDirection = EAST;
     }
 
     private void bottomRotateBtnActionPerformed(ActionEvent evt) {
         robotOrientationImage.setIcon(new ImageIcon(getClass().getResource("/cprefrontend/robot-orientation-south.png")));
-        activityLogTextArea.append("Sending command \"rotate(" + getDirection(currentDirection, SOUTH) + ")\"\n");
+        writer.logPrintln("Sending command \"rotate(" + getDirection(currentDirection, SOUTH) + ")\"");
         currentDirection = SOUTH;
     }
 
     private void leftRotateBtnActionPerformed(ActionEvent evt) {
         robotOrientationImage.setIcon(new ImageIcon(getClass().getResource("/cprefrontend/robot-orientation-west.png")));
-        activityLogTextArea.append("Sending command \"rotate(" + getDirection(currentDirection, WEST) + ")\"\n");
+        writer.logPrintln("Sending command \"rotate(" + getDirection(currentDirection, WEST) + ")\"");
         currentDirection = WEST;
     }
     // </editor-fold>
@@ -788,7 +785,7 @@ public class Window extends JFrame {
         leftRotateBtn.setEnabled(hasProfile);
         // TODO send bot number to robot
     }
-    
+
     public static JTextArea getActivityLog() {
         return activityLogTextArea;
     }

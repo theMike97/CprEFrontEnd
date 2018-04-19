@@ -5,6 +5,8 @@
  */
 package cprefrontend;
 
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import javax.swing.JTextArea;
 import javax.swing.text.BadLocationException;
 import javax.swing.text.Document;
@@ -25,17 +27,21 @@ public class ActivityLogWriter {
         log.append(line);
     }
     
-    public void logOverwriteln(String line) throws BadLocationException {
+    public void logOverwriteln(String line) {
         clearLine();
         logPrintln(line);
     }
     
-    public void clearLine() throws BadLocationException {
-        Document doc = log.getDocument();
-        String content = doc.getText(0, doc.getLength());
-        int linebreak = content.lastIndexOf('\n');
-        linebreak = (linebreak == -1) ? 0 : linebreak;
-        doc.remove(linebreak, doc.getLength() - linebreak);
+    public void clearLine() {
+        try {
+            Document doc = log.getDocument();
+            String content = doc.getText(0, doc.getLength());
+            int linebreak = content.lastIndexOf('\n');
+            linebreak = (linebreak == -1) ? 0 : linebreak;
+            doc.remove(linebreak, doc.getLength() - linebreak);
+        } catch (BadLocationException ex) {
+            Logger.getLogger(ActivityLogWriter.class.getName()).log(Level.SEVERE, null, ex);
+        }
     }
     
     public void logPrintln(String line) {
