@@ -45,11 +45,10 @@ public class ActivityLogWriter {
     }
     
     public void logPrintln(String line) {
-        if (log.getDocument().getLength() == 0) {
-            logWriteln(line);
-        } else {
-            log.append("\n" + line);
+        if (log.getDocument().getLength() > 0) {
+            logWriteln("\n");
         }
+            log.append(line);
     }
     
 }

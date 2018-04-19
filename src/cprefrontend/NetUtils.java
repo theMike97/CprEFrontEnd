@@ -14,6 +14,7 @@ import java.io.InputStreamReader;
 import java.io.OutputStream;
 import java.net.InetSocketAddress;
 import java.net.Socket;
+import java.net.SocketException;
 import java.net.SocketTimeoutException;
 import java.util.Scanner;
 import java.util.logging.Level;
@@ -33,11 +34,13 @@ public class NetUtils extends Thread {
     private int port;
     private JFrame parent;
     private Socket socket;
-    private InputStreamReader isr;
-    
+    private BufferedReader br;
+    private ActivityLogWriter writer;
+
     public NetUtils(JFrame parent) {
         this.parent = parent;
-        isr = null;
+        writer = new ActivityLogWriter();
+        br = null;
         ip = null;
         port = 0;
     }
@@ -49,7 +52,8 @@ public class NetUtils extends Thread {
     }
 
     /**
-     * Invoked with Thread.start() method.  Initializes socket at specified IP and port and stream readers and writers.
+     * Invoked with Thread.start() method. Initializes socket at specified IP
+     * and port and stream readers and writers.
      */
     @Override
     public void run() {
@@ -57,79 +61,84 @@ public class NetUtils extends Thread {
             socket = new Socket();
             socket.connect(new InetSocketAddress(ip, port), 500);
             System.out.println("Socket connected " + socket);
-            
-            isr = new InputStreamReader(socket.getInputStream());
-            
+
+            br = new BufferedReader(new InputStreamReader(socket.getInputStream()));
             DataOutputStream os = new DataOutputStream(socket.getOutputStream());
-            ActivityLogWriter writer = new ActivityLogWriter();
             
+            ActivityLogWriter writer = new ActivityLogWriter();
+
         } catch (SocketTimeoutException e) {
             JOptionPane.showMessageDialog(parent, "Connection timed out!\nCheck your IP and port.", "SocketTimeoutException", JOptionPane.ERROR_MESSAGE);
-            
+
         } catch (IOException ex) {
             JOptionPane.showMessageDialog(parent, "Could not connect!\nCheck your IP and port.", "IOException", JOptionPane.ERROR_MESSAGE);
         }
     }
-    
+
     /**
      * Returns field socket
+     *
      * @return socket
      */
     public Socket getSocket() {
         return socket;
     }
-    
+
     /**
      * Closes socket and InputStreamReader
-     * @throws IOException 
+     *
+     * @throws IOException
      */
     public void closeSocket() throws IOException {
-        isr.close();
+        br.close();
         socket.close();
     }
-    
+
     public void sendLine() {
 
     }
 
     /**
      * Reads byte stream from socket and filters into a string
+     *
+     * @param timeout
      * @return String from byte stream
+     * @throws java.net.SocketException
      */
-    public String readLine() {
+    public String readLine(int timeout) {
 
-        String line;
-        boolean isDone = false;
-
-        line = "";
-        isDone = false;
-        while (!isDone) {
+        String line = "";
+        long startTime = System.currentTimeMillis();
+        long elapsedTime = startTime;
+        
+        try {
             
-            try {
-                if (isr.ready()) {
-                    line += (char) isr.read();
-                }
-                if (!isr.ready() && line != "") {
-                    isDone = true;
-                }
-            } catch (IOException ex) {
-                Logger.getLogger(NetUtils.class.getName()).log(Level.SEVERE, null, ex);
+            int i;
+            
+            while ((i = br.read()) != ';' && (elapsedTime = System.currentTimeMillis() - startTime) < timeout) { // ';'
+                char c = (char) i;
+                line += c;
+                System.out.print(c);
             }
-            
+//            System.out.println("here");
+        } catch (IOException ex) {
+            Logger.getLogger(NetUtils.class.getName()).log(Level.SEVERE, null, ex);
         }
         return line;
     }
-    
+
     /**
      * Sets IP for socket
+     *
      * @param ip IP number for socket to connect to
      */
     public void setIP(String ip) {
         this.ip = ip;
     }
-    
+
     /**
      * Sets port for socket
+     *
      * @param port Port number for socket to connect through
      */
     public void setPort(int port) {

@@ -103,6 +103,8 @@ public class ConnectionDialog extends JDialog {
     }
 
     private void cancelBtnActionPerformed(ActionEvent evt) {
+        ipTextField.setText(null);
+        portTextField.setText("0");
         dispose();
     }
 

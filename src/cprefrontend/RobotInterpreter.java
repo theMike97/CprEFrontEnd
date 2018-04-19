@@ -11,10 +11,10 @@ package cprefrontend;
  */
 public class RobotInterpreter {
     
-    private Map parentMap;
+    Map map;
     
     public RobotInterpreter(Map map) {
-        parentMap = map;
+        this.map  = map;
     }
     
     public void parseResponse(String data) {
@@ -30,7 +30,19 @@ public class RobotInterpreter {
     }
     
     private void parseObstacleResponse(String[] arr) {
-        
+        try {
+            int distToCenter = Integer.parseInt(arr[1]);
+            int angleToCenter = Integer.parseInt(arr[2]);
+            int diameter = Integer.parseInt(arr[3]);
+            
+            // add diameter error filtering code here
+            
+            map.addObstacle(distToCenter, angleToCenter, diameter);
+            
+            
+        } catch (NumberFormatException | IndexOutOfBoundsException ex) {
+            ex.printStackTrace(); // do more stuff later
+        }
     }
     
     private void parseMoveResponse(String[] arr) {
@@ -45,9 +57,4 @@ public class RobotInterpreter {
                 break;
         }
     }
-    
-    public void drawResult() {
-        
-    }
-    
 }

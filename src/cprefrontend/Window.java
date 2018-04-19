@@ -79,17 +79,14 @@ public class Window extends JFrame {
     private JPanel topRotatePanel;
     private JButton scanBtn;
     // End GUI
-
+    
     // Logic
-    private final static int NORTH = 0;
-    private final static int EAST = 1;
-    private final static int SOUTH = 2;
-    private final static int WEST = 3;
 
 //    private final static String IP = "192.168.1.1";
 //    private final static int PORT = 288;
     private NetUtils comms;
     private ActivityLogWriter writer;
+    private RobotInterpreter interpreter;
 
     private int currentDirection;
     protected CalibrationProfile calibrationProfile;
@@ -207,6 +204,8 @@ public class Window extends JFrame {
                 mapPanelLayout.createParallelGroup(GroupLayout.Alignment.LEADING)
                         .addGap(0, 404, Short.MAX_VALUE)
         );
+        
+        interpreter = new RobotInterpreter(mapPanel);
 
         controlsPanel.setLayout(new GridLayout(1, 3));
 
@@ -696,7 +695,7 @@ public class Window extends JFrame {
         cd.createDialog();
         String ip = cd.getIP();
         int port = cd.getPort();
-        if (ip != null) {
+        if (!ip.equals("")) {
             comms.setIP(ip);
             comms.setPort(port);
             comms.start();
@@ -704,39 +703,39 @@ public class Window extends JFrame {
     }
 
     private void scanBtnActionPerformed(ActionEvent evt) {
-        if (!comms.isAlive()) {
-            JOptionPane.showMessageDialog(this, "Not connected to iRobot", "NullPointerException", JOptionPane.WARNING_MESSAGE);
-            return;
-        }
+//        if (!comms.isAlive()) {
+//            JOptionPane.showMessageDialog(this, "Not connected to iRobot", "NullPointerException", JOptionPane.WARNING_MESSAGE);
+//            return;
+//        }
         String line;
-        while ((line = comms.readLine()) == "") {
-            // wait until there is a line to read
-        }
+        // try 10 times until give up
+        line = comms.readLine(5000); // argument is time in milliseconds
+        interpreter.parseResponse(line);
         writer.logPrintln(line);
     }
 
     private void topRotateBtnActionPerformed(ActionEvent evt) {
         robotOrientationImage.setIcon(new ImageIcon(getClass().getResource("/cprefrontend/robot-orientation-north.png")));
-        writer.logPrintln("Sending command \"rotate(" + getDirection(currentDirection, NORTH) + ")\"");
-        currentDirection = NORTH;
+        writer.logPrintln("Sending command \"rotate(" + getDirection(currentDirection, Robot.NORTH) + ")\"");
+        currentDirection = Robot.NORTH;
     }
 
     private void rightRotateBtnActionPerformed(ActionEvent evt) {
         robotOrientationImage.setIcon(new ImageIcon(getClass().getResource("/cprefrontend/robot-orientation-east.png")));
-        writer.logPrintln("Sending command \"rotate(" + getDirection(currentDirection, EAST) + ")\"");
-        currentDirection = EAST;
+        writer.logPrintln("Sending command \"rotate(" + getDirection(currentDirection, Robot.EAST) + ")\"");
+        currentDirection = Robot.EAST;
     }
 
     private void bottomRotateBtnActionPerformed(ActionEvent evt) {
         robotOrientationImage.setIcon(new ImageIcon(getClass().getResource("/cprefrontend/robot-orientation-south.png")));
-        writer.logPrintln("Sending command \"rotate(" + getDirection(currentDirection, SOUTH) + ")\"");
-        currentDirection = SOUTH;
+        writer.logPrintln("Sending command \"rotate(" + getDirection(currentDirection, Robot.SOUTH) + ")\"");
+        currentDirection = Robot.SOUTH;
     }
 
     private void leftRotateBtnActionPerformed(ActionEvent evt) {
         robotOrientationImage.setIcon(new ImageIcon(getClass().getResource("/cprefrontend/robot-orientation-west.png")));
-        writer.logPrintln("Sending command \"rotate(" + getDirection(currentDirection, WEST) + ")\"");
-        currentDirection = WEST;
+        writer.logPrintln("Sending command \"rotate(" + getDirection(currentDirection, Robot.WEST) + ")\"");
+        currentDirection = Robot.WEST;
     }
     // </editor-fold>
 
