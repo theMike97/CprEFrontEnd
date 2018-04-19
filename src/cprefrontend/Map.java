@@ -32,12 +32,12 @@ public class Map extends JPanel {
         r = new Robot();
     }
     
-    private static class Obstacle {
+    private class Obstacle { // not static because robots direction can change
         
-        final int x;
-        final int y;
+        int x;
+        int y;
         final int diameter;
-        final int dist;
+        int dist;
         
         /**
          * Instantiates new obstacle relative to Robot where distance and diameter
@@ -53,9 +53,28 @@ public class Map extends JPanel {
             } else {
                 this.diameter = 12;
             }
-            x = 0 + (int) (distance * Math.cos(Math.toRadians(angleThroughCenter)));
-            y = 0 - (Robot.DIAMETER / 2) - (int)(diameter / 2) - (int) (distance * Math.sin(Math.toRadians(angleThroughCenter)));
+            x = 0;
+            y = 0;
             dist = (int) distance;
+            
+            switch(Robot.getDirection()) {
+                case Robot.NORTH:
+                    x = 0 + (int) (distance * Math.cos(Math.toRadians(angleThroughCenter)));
+                    y = 3 - (int) (Robot.DIAMETER / 2) - (int) ((diameter / 2) * Math.sin(Math.toRadians(angleThroughCenter))) - (int) (distance * Math.sin(Math.toRadians(angleThroughCenter)));
+                   break;
+                case Robot.EAST:
+                    x = 0 + (Robot.DIAMETER / 2) + (int)((diameter / 2) * Math.sin(Math.toRadians(angleThroughCenter))) + (int) (distance * Math.sin(Math.toRadians(angleThroughCenter)));
+                    y = 0 + (int) (distance * Math.cos(Math.toRadians(angleThroughCenter)));
+                    break;
+                case Robot.SOUTH:
+                    x = 0 - (int) (distance * Math.cos(Math.toRadians(angleThroughCenter)));
+                    y = 0 + (Robot.DIAMETER / 2) + (int)((diameter / 2) * Math.sin(Math.toRadians(angleThroughCenter))) + (int) (distance * Math.sin(Math.toRadians(angleThroughCenter)));
+                    break;
+                case Robot.WEST:
+                    x = 0 - (Robot.DIAMETER / 2) - (int)((diameter / 2) * Math.sin(Math.toRadians(angleThroughCenter))) - (int) (distance * Math.sin(Math.toRadians(angleThroughCenter)));
+                    y = 0 - (int) (distance * Math.cos(Math.toRadians(angleThroughCenter)));
+                    break;
+            }
         }
         
         @Override
@@ -69,7 +88,7 @@ public class Map extends JPanel {
         
     }
     
-    private static class Line {
+    private class Line { // not static because robot direction can change
         
         final int x1;
         final int y1;

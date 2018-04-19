@@ -718,24 +718,28 @@ public class Window extends JFrame {
         robotOrientationImage.setIcon(new ImageIcon(getClass().getResource("/cprefrontend/robot-orientation-north.png")));
         writer.logPrintln("Sending command \"rotate(" + getDirection(currentDirection, Robot.NORTH) + ")\"");
         currentDirection = Robot.NORTH;
+        Robot.setDirection(Robot.NORTH); // use a static method because I want DIRECTION to carry accross all Robot instances
     }
 
     private void rightRotateBtnActionPerformed(ActionEvent evt) {
         robotOrientationImage.setIcon(new ImageIcon(getClass().getResource("/cprefrontend/robot-orientation-east.png")));
         writer.logPrintln("Sending command \"rotate(" + getDirection(currentDirection, Robot.EAST) + ")\"");
         currentDirection = Robot.EAST;
+        Robot.setDirection(Robot.EAST);
     }
 
     private void bottomRotateBtnActionPerformed(ActionEvent evt) {
         robotOrientationImage.setIcon(new ImageIcon(getClass().getResource("/cprefrontend/robot-orientation-south.png")));
         writer.logPrintln("Sending command \"rotate(" + getDirection(currentDirection, Robot.SOUTH) + ")\"");
         currentDirection = Robot.SOUTH;
+        Robot.setDirection(Robot.SOUTH);
     }
 
     private void leftRotateBtnActionPerformed(ActionEvent evt) {
         robotOrientationImage.setIcon(new ImageIcon(getClass().getResource("/cprefrontend/robot-orientation-west.png")));
         writer.logPrintln("Sending command \"rotate(" + getDirection(currentDirection, Robot.WEST) + ")\"");
         currentDirection = Robot.WEST;
+        Robot.setDirection(Robot.WEST);
     }
     // </editor-fold>
 

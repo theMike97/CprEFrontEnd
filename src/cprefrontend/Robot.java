@@ -16,15 +16,14 @@ public class Robot {
     public final static int SOUTH = 2;
     public final static int WEST = 3;
     
-    private int direction;
     private int[] pos;
     public static int DIAMETER = 34;
+    private static int DIRECTION = NORTH;
     
     /**
      * Default constructor sets direction to north and position to (0,0)
      */
     public Robot() {
-        direction = 0; // north
         pos = new int[2];
     }
     
@@ -41,12 +40,12 @@ public class Robot {
         return pos;
     }
     
-    public void setDirection(int direction) {
-        this.direction = direction;
+    public static void setDirection(int direction) {
+        DIRECTION = direction;
     }
     
-    public int getDirection() {
-        return direction;
+    public static int getDirection() {
+        return DIRECTION;
     }
     
 }

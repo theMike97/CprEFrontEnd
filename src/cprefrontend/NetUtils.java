@@ -57,15 +57,15 @@ public class NetUtils extends Thread {
      */
     @Override
     public void run() {
+        writer = new ActivityLogWriter();
         try {
             socket = new Socket();
             socket.connect(new InetSocketAddress(ip, port), 500);
             System.out.println("Socket connected " + socket);
+            writer.logPrintln("Socket connected");
 
             br = new BufferedReader(new InputStreamReader(socket.getInputStream()));
             DataOutputStream os = new DataOutputStream(socket.getOutputStream());
-            
-            ActivityLogWriter writer = new ActivityLogWriter();
 
         } catch (SocketTimeoutException e) {
             JOptionPane.showMessageDialog(parent, "Connection timed out!\nCheck your IP and port.", "SocketTimeoutException", JOptionPane.ERROR_MESSAGE);
@@ -118,7 +118,7 @@ public class NetUtils extends Thread {
             while ((i = br.read()) != ';' && (elapsedTime = System.currentTimeMillis() - startTime) < timeout) { // ';'
                 char c = (char) i;
                 line += c;
-                System.out.print(c);
+//                System.out.print(c);
             }
 //            System.out.println("here");
         } catch (IOException ex) {
