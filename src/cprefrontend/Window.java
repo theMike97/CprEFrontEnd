@@ -13,6 +13,7 @@ import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.regex.Matcher;
@@ -702,16 +703,19 @@ public class Window extends JFrame {
         }
     }
 
-    private void scanBtnActionPerformed(ActionEvent evt) {
-//        if (!comms.isAlive()) {
-//            JOptionPane.showMessageDialog(this, "Not connected to iRobot", "NullPointerException", JOptionPane.WARNING_MESSAGE);
-//            return;
-//        }
+    private void scanBtnActionPerformed(ActionEvent evt) throws NumberFormatException {
+        writer.logPrintln("Scanning...");
+        comms.sendLine('s'); // send scan command ('s')
         String line;
-        // try 10 times until give up
-        line = comms.readLine(5000); // argument is time in milliseconds
-        interpreter.parseResponse(line);
+        line = comms.readLine(10000); // argument is time in milliseconds | this line gets total number of obstacles
         writer.logPrintln(line);
+        int obstacles = Integer.parseInt(line);
+        String[] lines = new String[obstacles];
+        for (int i = 0; i < obstacles; i++) {
+            lines[i] = comms.readLine(5000);
+            interpreter.parseResponse(lines[i]);
+            writer.logPrintln(lines[i]);
+        }
     }
 
     private void topRotateBtnActionPerformed(ActionEvent evt) {

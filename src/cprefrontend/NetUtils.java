@@ -35,12 +35,14 @@ public class NetUtils extends Thread {
     private JFrame parent;
     private Socket socket;
     private BufferedReader br;
+    private DataOutputStream os;
     private ActivityLogWriter writer;
 
     public NetUtils(JFrame parent) {
         this.parent = parent;
         writer = new ActivityLogWriter();
         br = null;
+        os = null;
         ip = null;
         port = 0;
     }
@@ -65,7 +67,7 @@ public class NetUtils extends Thread {
             writer.logPrintln("Socket connected");
 
             br = new BufferedReader(new InputStreamReader(socket.getInputStream()));
-            DataOutputStream os = new DataOutputStream(socket.getOutputStream());
+            os = new DataOutputStream(socket.getOutputStream());
 
         } catch (SocketTimeoutException e) {
             JOptionPane.showMessageDialog(parent, "Connection timed out!\nCheck your IP and port.", "SocketTimeoutException", JOptionPane.ERROR_MESSAGE);
@@ -90,12 +92,24 @@ public class NetUtils extends Thread {
      * @throws IOException
      */
     public void closeSocket() throws IOException {
+        // close output stream writer
+        os.flush();
+        os.close();
+        
+        //close input stream reader
         br.close();
+        
+        // close socket
         socket.close();
     }
 
-    public void sendLine() {
-
+    public void sendLine(char command) {
+        try {
+            os.writeByte(command);
+            os.flush();
+        } catch (IOException ex) {
+            Logger.getLogger(NetUtils.class.getName()).log(Level.SEVERE, null, ex);
+        }
     }
 
     /**
@@ -109,13 +123,12 @@ public class NetUtils extends Thread {
 
         String line = "";
         long startTime = System.currentTimeMillis();
-        long elapsedTime = startTime;
         
         try {
             
             int i;
             
-            while ((i = br.read()) != ';' && (elapsedTime = System.currentTimeMillis() - startTime) < timeout) { // ';'
+            while ((i = br.read()) != ';' && (System.currentTimeMillis() - startTime) < timeout) { // ';'
                 char c = (char) i;
                 line += c;
 //                System.out.print(c);

@@ -26,16 +26,24 @@ public class RobotInterpreter {
             case "move":
                 parseMoveResponse(responseArray);
                 break;
+            default:
+                return;
         }
     }
     
     private void parseObstacleResponse(String[] arr) {
         try {
-            int distToCenter = Integer.parseInt(arr[1]);
-            int angleToCenter = Integer.parseInt(arr[2]);
-            int diameter = Integer.parseInt(arr[3]);
+            int distToCenter = (int) (Double.parseDouble(arr[1]));
+            int angleToCenter = (int) Double.parseDouble(arr[2]);
+            int diameter = (int) Double.parseDouble(arr[3]);
             
-            // add diameter error filtering code here
+            if (diameter < 1) {
+                return; // dont do anything, this was a fluke
+            } else if (diameter < 9) {
+                diameter = 5;
+            } else {
+                diameter = 12;
+            }
             
             map.addObstacle(distToCenter, angleToCenter, diameter);
             
