@@ -1,6 +1,12 @@
 # Compiled class file
 *.class
 
+# XML files
+*.xml
+
+# Manifest file
+*.mf
+
 # Log file
 *.log
 
