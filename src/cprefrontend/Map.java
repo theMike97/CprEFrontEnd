@@ -44,6 +44,7 @@ public class Map extends JPanel {
             @Override
             public void mousePressed(MouseEvent evt) {
                 mousePt = evt.getPoint();
+                System.out.println(mousePt);
                 repaint();
             }
         });
@@ -187,9 +188,40 @@ public class Map extends JPanel {
         return ovalCoords;
     }
     
+    public void drawFutureRobotPosition() {
+        
+    }
+    
+    private void drawGrid(Graphics g, int gridSize) {
+        int offsetx = origin.x;
+        int offsety = origin.y;
+        g.setColor(new Color(220, 220, 220));
+        while (offsetx < getWidth()) {
+            g.drawLine(offsetx, 0, offsetx, getHeight());
+            offsetx += gridSize;
+        }
+        while (offsetx > 0) {
+            g.drawLine(offsetx, 0, offsetx, getHeight());
+            offsetx -= gridSize;
+        }
+        while (offsety < getHeight()) {
+            g.drawLine(0, offsety, getWidth(), offsety);
+            offsety += gridSize;
+        }
+        while (offsety > 0) {
+            g.drawLine(0, offsety, getWidth(), offsety);   
+            offsety-= gridSize;
+        }
+    }
+    
     @Override
     protected void paintComponent(Graphics g) {
         super.paintComponent(g);
+        g.setColor(Color.black);
+        
+        // draw a grid - static right now
+        drawGrid(g, 61); // floor tiles are 61x61 cm
+        
         g.setColor(Color.black);
         
         // loop through lines and obstacles and paint

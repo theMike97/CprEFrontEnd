@@ -18,6 +18,8 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+import javax.swing.event.DocumentEvent;
+import javax.swing.event.DocumentListener;
 import javax.swing.filechooser.FileNameExtensionFilter;
 import javax.swing.text.BadLocationException;
 import javax.swing.text.DefaultCaret;
@@ -79,6 +81,7 @@ public class Window extends JFrame {
     private JButton topRotateBtn;
     private JPanel topRotatePanel;
     private JButton scanBtn;
+    private JFrame frame;
     // End GUI
 
     // Logic
@@ -149,6 +152,7 @@ public class Window extends JFrame {
         rmRestartMenuItem = new JMenuItem();
         connectBtn = new JButton();
         scanBtn = new JButton();
+        frame = this;
 
         comms = new NetUtils(this, log); // start socket thread
 
@@ -620,10 +624,10 @@ public class Window extends JFrame {
             int distance = Integer.parseInt(moveTextField.getText());
             log.logPrintln("Sending command \"move" + distance + ";\"\n");
             comms.sendLine("move" + distance + ";");
-            
+
             String line = comms.readLine(5000);
             interpreter.parseResponse(line);
-            log.logPrintln(line);
+            System.out.println(line); // for dedugging purposes
 
         } catch (NumberFormatException e) {
             System.err.println("Distance must only contain numbers");
@@ -734,9 +738,9 @@ public class Window extends JFrame {
             int port = cd.getPort();
             if (!ip.equals("")) {
 //                try {
-                    comms.setIP(ip);
-                    comms.setPort(port);
-                    comms.createSocket();
+                comms.setIP(ip);
+                comms.setPort(port);
+                comms.createSocket();
 //                } catch (IOException ex) {
 //                    ex.printStackTrace();
 //                }
@@ -754,7 +758,7 @@ public class Window extends JFrame {
         for (int i = 0; i < obstacles; i++) {
             lines[i] = comms.readLine(5000);
             interpreter.parseResponse(lines[i]);
-            log.logPrintln(lines[i]);
+            System.out.println(lines[i]); // for dedugging purposes
         }
     }
 

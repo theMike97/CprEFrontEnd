@@ -27,6 +27,7 @@ public class RobotInterpreter {
                 parseMoveResponse(responseArray);
                 break;
             case "rotate":
+                parseRotateResponse(responseArray);
                 break;
             default:
                 return;
