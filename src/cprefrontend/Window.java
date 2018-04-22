@@ -32,7 +32,6 @@ public class Window extends JFrame {
 
     // <editor-fold defaultstate="collapsed" desc="Variable Declaration">
     // GUI
-    private JPanel CalibrationPanel;
     private JPanel actionLogPanel;
     private JScrollPane activityLogScrollPane;
     private ActivityLog log;
@@ -40,7 +39,10 @@ public class Window extends JFrame {
     private JPanel bottomRightSpacePanel;
     private JButton bottomRotateBtn;
     private JPanel bottomRotatePanel;
+    private JPanel connectBtnPanel;
     private JLabel calibrationLabel;
+    private JPanel calibrationLabelPanel;
+    private JPanel calibrationPanel;
     private JPanel centerOrientationPanel;
     private JButton connectBtn;
     private JPanel contentPanel;
@@ -73,7 +75,7 @@ public class Window extends JFrame {
     private JButton rightRotateBtn;
     private JPanel rightRotatePanel;
     private JMenuItem rmRestartMenuItem;
-    private JMenuItem rmRunMenuItem;
+//    private JMenuItem rmRunMenuItem;
     private JPanel robotOrientationPanel;
     private JPanel rotateControlPanel;
     private JMenu runMenu;
@@ -116,8 +118,9 @@ public class Window extends JFrame {
         moveLabel = new JLabel();
         moveTextField = new JTextField();
         moveBtn = new JButton();
-        CalibrationPanel = new JPanel();
+        calibrationPanel = new JPanel();
         calibrationLabel = new JLabel();
+        calibrationLabelPanel = new JPanel();
         jLabel2 = new JLabel();
         scanConnectPanel = new JPanel();
         rotateControlPanel = new JPanel();
@@ -152,8 +155,9 @@ public class Window extends JFrame {
         editMenu = new JMenu();
         emProfileDirectoryMenuItem = new JMenuItem();
         runMenu = new JMenu();
-        rmRunMenuItem = new JMenuItem();
+//        rmRunMenuItem = new JMenuItem();
         rmRestartMenuItem = new JMenuItem();
+        connectBtnPanel = new JPanel();
         connectBtn = new JButton();
         scanBtn = new JButton();
         frame = this;
@@ -189,24 +193,24 @@ public class Window extends JFrame {
         });
         setTitle("Team N2 iRobot Front End");
         setBounds(new Rectangle(0, 0, 0, 0));
-        setMinimumSize(new Dimension(640, 480));
+        setMinimumSize(new Dimension(1000, 783));
         setName("outsideFrame"); // NOI18N
         setResizable(true);
-        
+
         java.awt.GridBagLayout contentPanelLayout = new java.awt.GridBagLayout();
-        contentPanelLayout.rowHeights = new int[] {75, 10, 250, 10};
-        contentPanelLayout.columnWeights = new double[] {1.0};
-        contentPanelLayout.rowWeights = new double[] {1.0};
+        contentPanelLayout.rowHeights = new int[]{75, 10, 250, 10};
+        contentPanelLayout.columnWeights = new double[]{1.0};
+        contentPanelLayout.rowWeights = new double[]{1.0};
         contentPanel.setLayout(contentPanelLayout);
-        
+
         java.awt.GridBagLayout jPanel2Layout = new java.awt.GridBagLayout();
-        jPanel2Layout.columnWeights = new double[] {1.0};
+        jPanel2Layout.columnWeights = new double[]{1.0};
         mapContainer.setLayout(jPanel2Layout);
-        
+
         mapLabel.setFont(new Font("Tahoma", 1, 13)); // NOI18N
         mapLabel.setText("Playing Field");
         mapLabelContainer.add(mapLabel);
-        
+
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
         gridBagConstraints.weightx = 1.0;
@@ -222,8 +226,8 @@ public class Window extends JFrame {
                         .addGap(0, 0, Short.MAX_VALUE)
         );
         mapPanelLayout.setVerticalGroup(
-            mapPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGap(0, 433, Short.MAX_VALUE)
+                mapPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                        .addGap(0, 433, Short.MAX_VALUE)
         );
 
         gridBagConstraints = new java.awt.GridBagConstraints();
@@ -242,7 +246,7 @@ public class Window extends JFrame {
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.fill = java.awt.GridBagConstraints.BOTH;
         contentPanel.add(mapContainer, gridBagConstraints);
-        
+
         interpreter = new RobotInterpreter(mapPanel);
 
         controlsPanel.setLayout(new GridLayout(1, 3));
@@ -263,7 +267,9 @@ public class Window extends JFrame {
         moveBtn.setEnabled(hasProfile);
         movePanel.add(moveBtn);
 
-        CalibrationPanel.setLayout(new GridLayout(2, 0));
+        calibrationPanel.setLayout(new GridLayout(2, 0));
+
+        calibrationLabelPanel.setLayout(new FlowLayout(FlowLayout.LEFT));
 
         String profileName = calibrationProfile.getName();
         if (profileName == null) {
@@ -273,13 +279,17 @@ public class Window extends JFrame {
             calibrationLabel.setForeground(Color.green);
         }
         calibrationLabel.setText("Calibration Profile: " + profileName);
-        CalibrationPanel.add(calibrationLabel);
+        calibrationLabelPanel.add(calibrationLabel);
+        calibrationPanel.add(calibrationLabelPanel);
+
+        connectBtnPanel.setLayout(new FlowLayout(FlowLayout.LEFT));
 
         connectBtn.setText("Connect/Disconnect");
         connectBtn.addActionListener(this::connectBtnActionPerformed);
-        CalibrationPanel.add(connectBtn);
+        connectBtnPanel.add(connectBtn);
+        calibrationPanel.add(connectBtnPanel);
 
-        scanConnectPanel.setLayout(new FlowLayout());
+        scanConnectPanel.setLayout(new FlowLayout(FlowLayout.LEFT));
 
         scanBtn.setText("Scan");
         scanBtn.setEnabled(false);
@@ -293,7 +303,7 @@ public class Window extends JFrame {
                         .addGroup(leftControlPanelLayout.createSequentialGroup()
                                 .addGroup(leftControlPanelLayout.createParallelGroup(GroupLayout.Alignment.LEADING)
                                         .addComponent(movePanel, GroupLayout.DEFAULT_SIZE, GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                                        .addComponent(CalibrationPanel, GroupLayout.DEFAULT_SIZE, GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                                        .addComponent(calibrationPanel, GroupLayout.DEFAULT_SIZE, GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                                         .addComponent(scanConnectPanel, GroupLayout.DEFAULT_SIZE, GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
                                 .addContainerGap())
         );
@@ -303,7 +313,7 @@ public class Window extends JFrame {
                                 .addGap(5, 5, 5)
                                 .addComponent(movePanel, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)
                                 .addPreferredGap(LayoutStyle.ComponentPlacement.RELATED)
-                                .addComponent(CalibrationPanel, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)
+                                .addComponent(calibrationPanel, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)
                                 .addPreferredGap(LayoutStyle.ComponentPlacement.RELATED, GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                                 .addComponent(scanConnectPanel, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE))
         );
@@ -542,11 +552,11 @@ public class Window extends JFrame {
         GroupLayout actionLogPanelLayout = new GroupLayout(actionLogPanel);
         actionLogPanel.setLayout(actionLogPanelLayout);
         actionLogPanelLayout.setHorizontalGroup(
-            actionLogPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addComponent(logTextFieldPanel, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, actionLogPanelLayout.createSequentialGroup()
-                .addContainerGap()
-                .addComponent(logLabelPanel, javax.swing.GroupLayout.DEFAULT_SIZE, 302, Short.MAX_VALUE))
+                actionLogPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                        .addComponent(logTextFieldPanel, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                        .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, actionLogPanelLayout.createSequentialGroup()
+                                .addContainerGap()
+                                .addComponent(logLabelPanel, javax.swing.GroupLayout.DEFAULT_SIZE, 302, Short.MAX_VALUE))
         );
 
         actionLogPanelLayout.setVerticalGroup(
@@ -604,11 +614,10 @@ public class Window extends JFrame {
         runMenu.setText("Run");
         menuBar.add(runMenu);
 
-        rmRunMenuItem.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_F8, 0));
-        rmRunMenuItem.setText("Start");
-        rmRunMenuItem.addActionListener(this::rmRunMenuItemActionPerformed);
-        runMenu.add(rmRunMenuItem);
-
+//        rmRunMenuItem.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_F8, 0));
+//        rmRunMenuItem.setText("Start");
+//        rmRunMenuItem.addActionListener(this::rmRunMenuItemActionPerformed);
+//        runMenu.add(rmRunMenuItem);
         rmRestartMenuItem.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_F6, 0));
         rmRestartMenuItem.setText("Restart");
         rmRestartMenuItem.addActionListener(this::rmRestartMenuItemActionPerformed);
@@ -619,12 +628,12 @@ public class Window extends JFrame {
         GroupLayout layout = new GroupLayout(getContentPane());
         getContentPane().setLayout(layout);
         layout.setHorizontalGroup(
-            layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addComponent(contentPanel, javax.swing.GroupLayout.DEFAULT_SIZE, 1023, Short.MAX_VALUE)
+                layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                        .addComponent(contentPanel, javax.swing.GroupLayout.DEFAULT_SIZE, 1023, Short.MAX_VALUE)
         );
         layout.setVerticalGroup(
-            layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addComponent(contentPanel, javax.swing.GroupLayout.DEFAULT_SIZE, 683, Short.MAX_VALUE)
+                layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                        .addComponent(contentPanel, javax.swing.GroupLayout.DEFAULT_SIZE, 683, Short.MAX_VALUE)
         );
 
         pack();
@@ -632,6 +641,7 @@ public class Window extends JFrame {
         // init robot position to center of map
         mapPanel.moveRobot(mapPanel.getWidth() / 2, mapPanel.getHeight() / 2);
         mapPanel.repaint();
+//        System.out.println(this.getHeight() + ", " + this.getWidth());
     }
 // </editor-fold>                        
 
@@ -645,7 +655,7 @@ public class Window extends JFrame {
             if (distance == 0) {
                 throw new NumberFormatException();
             }
-            log.logPrintln("Sending command \"move" + distance + ";\"");
+            log.logPrintln("move" + distance + ";");
             comms.sendLine("move" + distance + ";");
 
             String line = comms.readLine(5000);
@@ -698,7 +708,7 @@ public class Window extends JFrame {
         CalibrationDialog cDialog = new CalibrationDialog(this);
         cDialog.createDialog();
         calibrationProfile = cDialog.getCalibrationProfile();
-        if (calibrationProfile.getBot() == -1 || calibrationProfile.getName() == null) {
+        if (calibrationProfile.getName() == null) {
             log.logPrintErr("Invalid calibration profile");
             return;
         }
@@ -714,10 +724,6 @@ public class Window extends JFrame {
 
     }
 
-    private void rmRunMenuItemActionPerformed(ActionEvent evt) {
-
-    }
-
     private void rmRestartMenuItemActionPerformed(ActionEvent evt) {
         try {
             log.clear();
@@ -727,7 +733,8 @@ public class Window extends JFrame {
 
             calibrationLabel.setText("Calibration Profile: No Profile Selected");
             calibrationLabel.setForeground(Color.red);
-            calibrationProfile.setBot(-1);
+            calibrationProfile.setOffset(0);
+            calibrationProfile.setMultiplier(1);
             calibrationProfile.setName(null);
             log.logPrintln("Unloaded calibration data");
 
@@ -772,6 +779,7 @@ public class Window extends JFrame {
     }
 
     private void scanBtnActionPerformed(ActionEvent evt) throws NumberFormatException {
+        log.logPrintln("scan;");
         comms.sendLine("scan;"); // send scan command
         String line;
         line = comms.readLine(5000); // argument is time in milliseconds | this line gets total number of obstacles
@@ -787,8 +795,7 @@ public class Window extends JFrame {
 
     private void topRotateBtnActionPerformed(ActionEvent evt) {
         robotOrientationImage.setIcon(new ImageIcon(getClass().getResource("/cprefrontend/robot-orientation-north.png")));
-        log.logPrintln("Sending command \"rotate" + getDirection(currentDirection, Robot.NORTH) + ";\"");
-//        System.out.println("rotate" + getDirection(currentDirection, Robot.NORTH) + ";");
+        log.logPrintln("rotate" + getDirection(currentDirection, Robot.NORTH) + ";");
         comms.sendLine("rotate" + getDirection(currentDirection, Robot.NORTH) + ";");
         currentDirection = Robot.NORTH;
         Robot.setDirection(Robot.NORTH); // use a static method because I want DIRECTION to carry accross all Robot instances
@@ -796,7 +803,7 @@ public class Window extends JFrame {
 
     private void rightRotateBtnActionPerformed(ActionEvent evt) {
         robotOrientationImage.setIcon(new ImageIcon(getClass().getResource("/cprefrontend/robot-orientation-east.png")));
-        log.logPrintln("Sending command \"rotate" + getDirection(currentDirection, Robot.EAST) + ";\"");
+        log.logPrintln("rotate" + getDirection(currentDirection, Robot.EAST) + ";");
         comms.sendLine("rotate" + getDirection(currentDirection, Robot.EAST) + ";");
         currentDirection = Robot.EAST;
         Robot.setDirection(Robot.EAST);
@@ -804,7 +811,7 @@ public class Window extends JFrame {
 
     private void bottomRotateBtnActionPerformed(ActionEvent evt) {
         robotOrientationImage.setIcon(new ImageIcon(getClass().getResource("/cprefrontend/robot-orientation-south.png")));
-        log.logPrintln("Sending command \"rotate" + getDirection(currentDirection, Robot.SOUTH) + ";\"");
+        log.logPrintln("rotate" + getDirection(currentDirection, Robot.SOUTH) + ";");
         comms.sendLine("rotate" + getDirection(currentDirection, Robot.SOUTH) + ";");
         currentDirection = Robot.SOUTH;
         Robot.setDirection(Robot.SOUTH);
@@ -812,7 +819,7 @@ public class Window extends JFrame {
 
     private void leftRotateBtnActionPerformed(ActionEvent evt) {
         robotOrientationImage.setIcon(new ImageIcon(getClass().getResource("/cprefrontend/robot-orientation-west.png")));
-        log.logPrintln("Sending command \"rotate" + getDirection(currentDirection, Robot.WEST) + ";\"");
+        log.logPrintln("rotate" + getDirection(currentDirection, Robot.WEST) + ";");
         comms.sendLine("rotate" + getDirection(currentDirection, Robot.WEST) + ";");
         currentDirection = Robot.WEST;
         Robot.setDirection(Robot.WEST);
@@ -844,7 +851,8 @@ public class Window extends JFrame {
 
             if (comms.getSocket() != null && !comms.getSocket().isClosed()) {
                 try {
-                    calibrationProfile.setBot(Integer.parseInt(profile[1]));
+                    calibrationProfile.setOffset(Integer.parseInt(profile[1]));
+                    calibrationProfile.setMultiplier(Integer.parseInt(profile[2]));
                     loadProfile(calibrationProfile);
                     log.logPrintln("Loaded calibration profile \"" + calibrationProfile.getName() + "\"");
                 } catch (NumberFormatException ex) {
@@ -864,9 +872,33 @@ public class Window extends JFrame {
         }
     }
 
+    protected void loadTestProfile(CalibrationProfile cpf, int status) {
+        if (status != 0) {
+            Integer offset = cpf.getOffset();
+            Integer mult = cpf.getMultiplier();
+
+            System.out.println((char) (status + 48) + ", " + offset + ", " + mult);
+
+            char c = (char) (status + 48);
+            comms.sendLine(c + ";");
+            if (status == 1) {
+                comms.sendLine(offset + ";");
+            } else {
+                comms.sendLine(mult + ";");
+            }
+        } else {
+//            loadProfile(cpf);
+        }
+    }
+
     private void loadProfile(CalibrationProfile cpf) {
-        char bot = (char) (cpf.getBot() + 48);
-        comms.sendChar(bot);
+        char status = '0';
+        int offset = calibrationProfile.getOffset();
+        int mult = calibrationProfile.getMultiplier();
+
+        comms.sendLine(status + ";");
+        comms.sendLine(offset + ";");
+        comms.sendLine(mult + ";");
 
         calibrationLabel.setText("Calibration Profile: " + cpf.getName());
         calibrationLabel.setForeground(Color.green);

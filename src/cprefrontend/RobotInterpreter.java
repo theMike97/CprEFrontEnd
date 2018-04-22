@@ -56,18 +56,24 @@ public class RobotInterpreter {
     }
 
     private void parseMoveResponse(String[] arr) {
-        switch (arr[1]) {
-            case "left":
-                break;
-            case "right":
-                break;
-            case "line":
-                break;
-            case "cliff":
-                break;
-            default:
-                try {
-                    int distance = Integer.parseInt(arr[1]);
+        int distance;
+        try {
+            switch (arr[1]) {
+                case "left":
+                    distance = Integer.parseInt(arr[2]);
+                    map.addObstacle(7, 45, 13);
+                    break;
+                case "right":
+                    distance = Integer.parseInt(arr[2]);
+                    break;
+                case "line":
+                    distance = Integer.parseInt(arr[2]);
+                    break;
+                case "cliff":
+                    distance = Integer.parseInt(arr[2]);
+                    break;
+                default:
+                    distance = Integer.parseInt(arr[1]);
 //                    System.out.println("[" + arr[1] + "]");
                     switch (Robot.getDirection()) {
                         case Robot.NORTH:
@@ -83,9 +89,9 @@ public class RobotInterpreter {
                             map.moveRobot(map.getCurrentRobotCoords()[0] - distance, map.getCurrentRobotCoords()[1]);
                             break;
                     }
-                } catch (NumberFormatException ex) {
-                    ex.printStackTrace();
-                }
+            }
+        } catch (NumberFormatException ex) {
+            ex.printStackTrace();
         }
     }
 

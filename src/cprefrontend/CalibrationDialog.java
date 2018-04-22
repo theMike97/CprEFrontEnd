@@ -16,6 +16,7 @@ import java.io.IOException;
 import java.io.OutputStreamWriter;
 import java.io.PrintWriter;
 import java.io.UnsupportedEncodingException;
+import javax.swing.BorderFactory;
 import javax.swing.JButton;
 import javax.swing.JDialog;
 import javax.swing.JFrame;
@@ -30,15 +31,24 @@ import javax.swing.JTextField;
  */
 public class CalibrationDialog extends JDialog {
 
-    private CalibrationProfile calibrationProfile;
-    private JTextField botNumberTextField;
-    private JTextField profileNameTextField;
+    private Window window;
     
+    private CalibrationProfile calibrationProfile;
+    private JTextField centerOffsetTextField;
+    private JTextField profileNameTextField;
+    private JTextField multiplierTextField;
+
+    private JButton tryOffsetBtn;
+    private JButton tryMultBtn;
+
     private String profileName;
 
     public CalibrationDialog(JFrame parent) {
         super(parent, "Create new calibration profile", true);
+        window = (Window) parent;
         calibrationProfile = new CalibrationProfile();
+        calibrationProfile.setMultiplier(1);
+        calibrationProfile.setOffset(0);
 
         if (parent != null) {
             Dimension parentSize = parent.getSize();
@@ -46,7 +56,7 @@ public class CalibrationDialog extends JDialog {
             setLocation(p.x + parentSize.width / 4, p.y + parentSize.height / 4);
         }
     }
-    
+
     public CalibrationDialog(JFrame parent, String profileName) {
         this(parent);
         this.profileName = profileName;
@@ -57,19 +67,33 @@ public class CalibrationDialog extends JDialog {
         setDefaultCloseOperation(DISPOSE_ON_CLOSE);
 
         JLabel profileNameLabel = new JLabel("Profile Name:");
-
-        JLabel botNumberLabel = new JLabel("Robot Number:");
+//        profileNameLabel.setBorder(BorderFactory.createEmptyBorder(5,5,5,5));
+        JLabel centerOffsetLabel = new JLabel("Center offset:");
+//        centerOffsetLabel.setBorder(BorderFactory.createEmptyBorder(5,5,5,5));
+        JLabel multiplierLabel = new JLabel("Multiplier:");
 
         profileNameTextField = new JTextField(profileName, 10);
 
-        botNumberTextField = new JTextField(10);
+        centerOffsetTextField = new JTextField("0", 10);
+        tryOffsetBtn = new JButton("Go");
+        tryOffsetBtn.addActionListener(this::tryOffsetBtnActionPerformed);
+
+        multiplierTextField = new JTextField("1", 10);
+        tryMultBtn = new JButton("Go");
+        tryMultBtn.addActionListener(this::tryMultBtnActionPerformed);
 
         JPanel fieldsPanel = new JPanel();
-        fieldsPanel.setLayout(new FlowLayout());
+        fieldsPanel.setLayout(new FlowLayout(FlowLayout.LEFT));
+        fieldsPanel.setBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10));
         fieldsPanel.add(profileNameLabel);
         fieldsPanel.add(profileNameTextField);
-        fieldsPanel.add(botNumberLabel);
-        fieldsPanel.add(botNumberTextField);
+        fieldsPanel.add(centerOffsetLabel);
+        fieldsPanel.add(centerOffsetTextField);
+        fieldsPanel.add(tryOffsetBtn);
+        fieldsPanel.add(multiplierLabel);
+        fieldsPanel.add(multiplierTextField);
+        fieldsPanel.add(tryMultBtn);
+
         getContentPane().add(fieldsPanel);
 
         JButton cancelBtn = new JButton("Cancel");
@@ -83,7 +107,7 @@ public class CalibrationDialog extends JDialog {
         btnsPanel.add(cancelBtn);
         getContentPane().add(btnsPanel, BorderLayout.SOUTH);
 
-        setSize(300, 150);
+        setSize(300, 300);
 //        pack();
         setVisible(true);
     }
@@ -101,28 +125,43 @@ public class CalibrationDialog extends JDialog {
         }
         calibrationProfile.setName(profileName);
         try {
-            calibrationProfile.setBot(Integer.parseInt(botNumberTextField.getText()));
+            calibrationProfile.setOffset(Integer.parseInt(centerOffsetTextField.getText()));
+            calibrationProfile.setMultiplier(Integer.parseInt(multiplierTextField.getText()));
         } catch (NumberFormatException ex) {
-            System.err.println("Bot must be a number");
-            JOptionPane.showMessageDialog(this, "Bot must be a number", "NumberFormatExcpetion", JOptionPane.ERROR_MESSAGE);
+            System.err.println("Fields must be numbers");
+            JOptionPane.showMessageDialog(this, "Fields must be numbers", "NumberFormatExcpetion", JOptionPane.ERROR_MESSAGE);
         }
 
+        try (PrintWriter writer = new PrintWriter(new OutputStreamWriter(new FileOutputStream(profileName + ".profile"), "utf-8"))) {
+            writer.println(profileName);
+            writer.println("" + calibrationProfile.getOffset());
+            writer.println("" + calibrationProfile.getMultiplier());
 
-            try (PrintWriter writer = new PrintWriter(new OutputStreamWriter(new FileOutputStream(profileName + ".profile"), "utf-8"))) {
-                writer.println(profileName);
-                writer.println("" + calibrationProfile.getBot());
-
-            } catch (FileNotFoundException ex) {
-
-            } catch (UnsupportedEncodingException ex) {
-
-            } catch (IOException ex) {
-                
-            }
-            dispose();
+        } catch (FileNotFoundException | UnsupportedEncodingException ex) {
+            ex.printStackTrace();
         }
+        dispose();
+    }
 
-    
+    private void tryOffsetBtnActionPerformed(ActionEvent evt) {
+        try {
+            calibrationProfile.setOffset(Integer.parseInt(centerOffsetTextField.getText()));
+            window.loadTestProfile(calibrationProfile, 1);
+        } catch (NumberFormatException ex) {
+            System.err.println("Fields must be numbers");
+            JOptionPane.showMessageDialog(this, "Fields must be numbers", "NumberFormatExcpetion", JOptionPane.ERROR_MESSAGE);
+        }
+    }
+
+    private void tryMultBtnActionPerformed(ActionEvent evt) {
+        try {
+            calibrationProfile.setMultiplier(Integer.parseInt(multiplierTextField.getText()));
+            window.loadTestProfile(calibrationProfile, 2);
+        } catch (NumberFormatException ex) {
+            System.err.println("Fields must be numbers");
+            JOptionPane.showMessageDialog(this, "Fields must be numbers", "NumberFormatExcpetion", JOptionPane.ERROR_MESSAGE);
+        }
+    }
 
     public CalibrationProfile getCalibrationProfile() {
         return calibrationProfile;

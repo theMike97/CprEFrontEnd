@@ -12,37 +12,47 @@ package cprefrontend;
 public class CalibrationProfile {
 
     private String name;
-    private int robot;
+    private int offset;
+    private int multiplier;
 
     public CalibrationProfile() {
         name = null;
-        robot = -1;
+        offset = 0;
+        multiplier = 1;
     }
 
     public CalibrationProfile(String name) {
+        this();
         this.name = name;
-        robot = -1;
     }
 
     public void setName(String name) {
         this.name = name;
     }
 
-    public void setBot(int bot) {
-        robot = bot;
+    public void setOffset(int offset) {
+        this.offset = offset;
+    }
+    
+    public void setMultiplier(int multiplier) {
+        this.multiplier = multiplier;
     }
 
     public String getName() {
         return name;
     }
 
-    public int getBot() {
-        return robot;
+    public int getOffset() {
+        return offset;
+    }
+    
+    public int getMultiplier() {
+        return multiplier;
     }
 
     @Override
     public String toString() {
-        return name + "\n" + robot;
+        return name + ", " + offset + ", " + multiplier;
     }
 
 }
