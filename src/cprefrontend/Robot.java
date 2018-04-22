@@ -5,6 +5,8 @@
  */
 package cprefrontend;
 
+import java.util.Arrays;
+
 /**
  *
  * @author Mike
@@ -33,10 +35,12 @@ public class Robot {
     }
     
     public void setPosition(int[] pos) {
-        this.pos = pos;
+        this.pos[0] = pos[0];
+        this.pos[1] = pos[1];
     }
     
     public int[] getPosition() {
+//        System.out.println("new pos: " + Arrays.toString(pos));
         return pos;
     }
     

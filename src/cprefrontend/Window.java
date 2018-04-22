@@ -607,6 +607,7 @@ public class Window extends JFrame {
 
         // init robot position to center of map
         mapPanel.moveRobot(mapPanel.getWidth() / 2, mapPanel.getHeight() / 2);
+        mapPanel.repaint();
     }
 // </editor-fold>                        
 
@@ -619,6 +620,10 @@ public class Window extends JFrame {
             int distance = Integer.parseInt(moveTextField.getText());
             log.logPrintln("Sending command \"move" + distance + ";\"\n");
             comms.sendLine("move" + distance + ";");
+            
+            String line = comms.readLine(5000);
+            interpreter.parseResponse(line);
+            log.logPrintln(line);
 
         } catch (NumberFormatException e) {
             System.err.println("Distance must only contain numbers");
@@ -740,7 +745,7 @@ public class Window extends JFrame {
     }
 
     private void scanBtnActionPerformed(ActionEvent evt) throws NumberFormatException {
-        comms.sendLine("scan;"); // send scan command ('s')
+        comms.sendLine("scan;"); // send scan command
         String line;
         line = comms.readLine(5000); // argument is time in milliseconds | this line gets total number of obstacles
         log.logPrintln(line);

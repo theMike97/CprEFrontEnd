@@ -8,6 +8,10 @@ package cprefrontend;
 import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.Graphics;
+import java.awt.Point;
+import java.awt.event.MouseAdapter;
+import java.awt.event.MouseEvent;
+import java.awt.event.MouseMotionAdapter;
 import java.awt.event.MouseWheelEvent;
 import java.awt.event.MouseWheelListener;
 import java.util.ArrayList;
@@ -22,14 +26,39 @@ public class Map extends JPanel {
     
     private ArrayList<Obstacle> obstacles;
     private ArrayList<Line> lines;
+    private ArrayList<int[]> rPositions;
 //    private final double scale = 1.0;
     private Robot r;
+    private Point mousePt;
+    private Point origin;
     
     public Map() {
         super();
+        origin = new Point(0,0);
         obstacles = new ArrayList<>();
         lines = new ArrayList<>();
+        rPositions = new ArrayList<>();
         r = new Robot();
+        
+        this.addMouseListener(new MouseAdapter() {
+            @Override
+            public void mousePressed(MouseEvent evt) {
+                mousePt = evt.getPoint();
+                repaint();
+            }
+        });
+        this.addMouseMotionListener(new MouseMotionAdapter() {
+            @Override
+            public void mouseDragged(MouseEvent evt) {
+                if (evt.getButton() == 0) {
+                    int dx = evt.getX() - mousePt.x;
+                    int dy = evt.getY() - mousePt.y;
+                    origin.setLocation(origin.x+dx, origin.y+dy);
+                    mousePt = evt.getPoint();
+                    repaint();
+                }
+            }
+        });
     }
     
     private class Obstacle { // not static because robots direction can change
@@ -122,7 +151,10 @@ public class Map extends JPanel {
     }
     
     public void addObstacle(double distance, double angleThroughCenter, double diameter) {
-        obstacles.add(new Obstacle(distance, angleThroughCenter, diameter));
+        Obstacle o = new Obstacle(distance, angleThroughCenter, diameter);
+        obstacles.add(o);
+        int[] adjusted = getAdjustedObstacleCoords(o, r.getPosition()[0], r.getPosition()[1]);
+        rPositions.add(adjusted);
         repaint();
     }
     
@@ -133,7 +165,12 @@ public class Map extends JPanel {
     
     public void moveRobot(int x, int y) { // moves origin since robot is always at origin
         r.setPosition(x, y);
+//        System.out.println(Arrays.toString(r.getPosition()));
         repaint();
+    }
+    
+    public int[] getCurrentRobotCoords() {
+        return r.getPosition();
     }
     
     private int[] getAdjustedObstacleCoords(Obstacle o, int robotx, int roboty) {
@@ -145,8 +182,8 @@ public class Map extends JPanel {
     
     private int[] getOvalCoords(int x, int y, double diameter) {
         int[] ovalCoords = new int[2];
-        ovalCoords[0] = (int)(x - (diameter / 2));
-        ovalCoords[1] = (int)(y - (diameter / 2));
+        ovalCoords[0] = (int)(x - (diameter / 2)) + origin.x;
+        ovalCoords[1] = (int)(y - (diameter / 2)) + origin.y;
         return ovalCoords;
     }
     
@@ -160,9 +197,13 @@ public class Map extends JPanel {
             g.drawLine(line.x1, line.y1, line.x2, line.y2);
         }
         
-        for (Obstacle obstacle : obstacles) {
-            int[] adjusted = getAdjustedObstacleCoords(obstacle, r.getPosition()[0], r.getPosition()[1]);
-            g.drawOval(getOvalCoords(adjusted[0], adjusted[1], obstacle.diameter)[0], getOvalCoords(adjusted[0], adjusted[1], obstacle.diameter)[1], obstacle.diameter, obstacle.diameter);
+        for (int i = 0; i < obstacles.size(); i++) {
+//            System.out.println("rPositions: " + Arrays.toString(rPositions.get(i)));
+            g.drawOval(
+                    getOvalCoords(rPositions.get(i)[0], rPositions.get(i)[1], obstacles.get(i).diameter)[0],
+                    getOvalCoords(rPositions.get(i)[0], rPositions.get(i)[1], obstacles.get(i).diameter)[1],
+                    obstacles.get(i).diameter, 
+                    obstacles.get(i).diameter);
         }
         
         g.setColor(Color.green);

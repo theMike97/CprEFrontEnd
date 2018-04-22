@@ -147,13 +147,13 @@ public class NetUtils extends Thread {
     public String readLine(long timeout) {
 
         String line = "";
-        long startTime = System.currentTimeMillis();
+//        long startTime = System.currentTimeMillis();
 
         try {
 
             int i;
 
-            while ((i = br.read()) != ';' && (System.currentTimeMillis() - startTime) < timeout) { // ';'
+            while ((i = br.read()) != ';') { // ';'
                 char c = (char) i;
                 line += c;
 //                System.out.print(c);
