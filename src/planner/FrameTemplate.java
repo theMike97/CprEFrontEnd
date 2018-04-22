@@ -30,6 +30,8 @@ public class FrameTemplate extends javax.swing.JFrame {
 
         startDirectionGroup = new javax.swing.ButtonGroup();
         contentPanel = new javax.swing.JPanel();
+        mapContainer = new javax.swing.JPanel();
+        mapLabelContainer = new javax.swing.JPanel();
         mapLabel = new javax.swing.JLabel();
         mapPanel = new javax.swing.JPanel();
         controlsPanel = new javax.swing.JPanel();
@@ -85,8 +87,24 @@ public class FrameTemplate extends javax.swing.JFrame {
         setMinimumSize(new java.awt.Dimension(640, 480));
         setName("outsideFrame"); // NOI18N
 
+        java.awt.GridBagLayout contentPanelLayout = new java.awt.GridBagLayout();
+        contentPanelLayout.rowHeights = new int[] {0, 75};
+        contentPanelLayout.columnWeights = new double[] {1.0};
+        contentPanelLayout.rowWeights = new double[] {1.0};
+        contentPanel.setLayout(contentPanelLayout);
+
+        java.awt.GridBagLayout jPanel2Layout = new java.awt.GridBagLayout();
+        jPanel2Layout.columnWeights = new double[] {1.0};
+        mapContainer.setLayout(jPanel2Layout);
+
         mapLabel.setFont(new java.awt.Font("Tahoma", 1, 13)); // NOI18N
         mapLabel.setText("Playing Field");
+        mapLabelContainer.add(mapLabel);
+
+        gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
+        gridBagConstraints.weightx = 1.0;
+        mapContainer.add(mapLabelContainer, gridBagConstraints);
 
         mapPanel.setBackground(new java.awt.Color(255, 255, 255));
         mapPanel.setBorder(javax.swing.BorderFactory.createEtchedBorder());
@@ -99,8 +117,25 @@ public class FrameTemplate extends javax.swing.JFrame {
         );
         mapPanelLayout.setVerticalGroup(
             mapPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGap(0, 404, Short.MAX_VALUE)
+            .addGap(0, 429, Short.MAX_VALUE)
         );
+
+        gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints.gridx = 0;
+        gridBagConstraints.gridy = 1;
+        gridBagConstraints.gridwidth = 2;
+        gridBagConstraints.fill = java.awt.GridBagConstraints.BOTH;
+        gridBagConstraints.ipadx = 788;
+        gridBagConstraints.ipady = 404;
+        gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHWEST;
+        gridBagConstraints.weightx = 1.0;
+        gridBagConstraints.weighty = 1.0;
+        gridBagConstraints.insets = new java.awt.Insets(6, 6, 0, 6);
+        mapContainer.add(mapPanel, gridBagConstraints);
+
+        gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints.fill = java.awt.GridBagConstraints.BOTH;
+        contentPanel.add(mapContainer, gridBagConstraints);
 
         controlsPanel.setLayout(new java.awt.GridLayout(1, 3));
 
@@ -430,7 +465,7 @@ public class FrameTemplate extends javax.swing.JFrame {
             .addComponent(logTextFieldPanel, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
             .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, actionLogPanelLayout.createSequentialGroup()
                 .addContainerGap()
-                .addComponent(logLabelPanel, javax.swing.GroupLayout.DEFAULT_SIZE, 258, Short.MAX_VALUE))
+                .addComponent(logLabelPanel, javax.swing.GroupLayout.DEFAULT_SIZE, 302, Short.MAX_VALUE))
         );
         actionLogPanelLayout.setVerticalGroup(
             actionLogPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -442,32 +477,15 @@ public class FrameTemplate extends javax.swing.JFrame {
 
         controlsPanel.add(actionLogPanel);
 
-        javax.swing.GroupLayout contentPanelLayout = new javax.swing.GroupLayout(contentPanel);
-        contentPanel.setLayout(contentPanelLayout);
-        contentPanelLayout.setHorizontalGroup(
-            contentPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(contentPanelLayout.createSequentialGroup()
-                .addContainerGap()
-                .addGroup(contentPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addComponent(controlsPanel, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                    .addComponent(mapPanel, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
-                .addContainerGap())
-            .addGroup(contentPanelLayout.createSequentialGroup()
-                .addGap(383, 383, 383)
-                .addComponent(mapLabel)
-                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
-        );
-        contentPanelLayout.setVerticalGroup(
-            contentPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(contentPanelLayout.createSequentialGroup()
-                .addContainerGap()
-                .addComponent(mapLabel)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(mapPanel, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(controlsPanel, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                .addContainerGap())
-        );
+        gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints.gridx = 0;
+        gridBagConstraints.gridy = 2;
+        gridBagConstraints.gridwidth = 2;
+        gridBagConstraints.fill = java.awt.GridBagConstraints.BOTH;
+        gridBagConstraints.ipadx = 60;
+        gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHWEST;
+        gridBagConstraints.insets = new java.awt.Insets(6, 6, 6, 6);
+        contentPanel.add(controlsPanel, gridBagConstraints);
 
         fileMenu.setText("File");
 
@@ -514,11 +532,11 @@ public class FrameTemplate extends javax.swing.JFrame {
         getContentPane().setLayout(layout);
         layout.setHorizontalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addComponent(contentPanel, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+            .addComponent(contentPanel, javax.swing.GroupLayout.DEFAULT_SIZE, 1023, Short.MAX_VALUE)
         );
         layout.setVerticalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addComponent(contentPanel, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+            .addComponent(contentPanel, javax.swing.GroupLayout.PREFERRED_SIZE, 683, Short.MAX_VALUE)
         );
 
         pack();
@@ -627,7 +645,9 @@ public class FrameTemplate extends javax.swing.JFrame {
     private javax.swing.JLabel logLabel;
     private javax.swing.JPanel logLabelPanel;
     private javax.swing.JPanel logTextFieldPanel;
+    private javax.swing.JPanel mapContainer;
     private javax.swing.JLabel mapLabel;
+    private javax.swing.JPanel mapLabelContainer;
     private javax.swing.JPanel mapPanel;
     private javax.swing.JMenuBar menuBar;
     private javax.swing.JButton moveBtn;

@@ -61,7 +61,9 @@ public class Window extends JFrame {
     private JLabel logLabel;
     private JPanel logLabelPanel;
     private JPanel logTextFieldPanel;
+    private JPanel mapContainer;
     private JLabel mapLabel;
+    private JPanel mapLabelContainer;
     private Map mapPanel;
     private JMenuBar menuBar;
     private JButton moveBtn;
@@ -104,7 +106,9 @@ public class Window extends JFrame {
 
         // <editor-fold defaultstate="collapsed" desc="Variable Initialization">
         contentPanel = new JPanel();
+        mapContainer = new JPanel();
         mapLabel = new JLabel();
+        mapLabelContainer = new JPanel();
         mapPanel = new Map();
         controlsPanel = new JPanel();
         leftControlPanel = new JPanel();
@@ -187,10 +191,26 @@ public class Window extends JFrame {
         setBounds(new Rectangle(0, 0, 0, 0));
         setMinimumSize(new Dimension(640, 480));
         setName("outsideFrame"); // NOI18N
-        setResizable(false);
-
+        setResizable(true);
+        
+        java.awt.GridBagLayout contentPanelLayout = new java.awt.GridBagLayout();
+        contentPanelLayout.rowHeights = new int[] {75, 10, 250, 10};
+        contentPanelLayout.columnWeights = new double[] {1.0};
+        contentPanelLayout.rowWeights = new double[] {1.0};
+        contentPanel.setLayout(contentPanelLayout);
+        
+        java.awt.GridBagLayout jPanel2Layout = new java.awt.GridBagLayout();
+        jPanel2Layout.columnWeights = new double[] {1.0};
+        mapContainer.setLayout(jPanel2Layout);
+        
         mapLabel.setFont(new Font("Tahoma", 1, 13)); // NOI18N
         mapLabel.setText("Playing Field");
+        mapLabelContainer.add(mapLabel);
+        
+        gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
+        gridBagConstraints.weightx = 1.0;
+        mapContainer.add(mapLabelContainer, gridBagConstraints);
 
         mapPanel.setBackground(new Color(255, 255, 255));
         mapPanel.setBorder(BorderFactory.createEtchedBorder());
@@ -202,10 +222,27 @@ public class Window extends JFrame {
                         .addGap(0, 0, Short.MAX_VALUE)
         );
         mapPanelLayout.setVerticalGroup(
-                mapPanelLayout.createParallelGroup(GroupLayout.Alignment.LEADING)
-                        .addGap(0, 404, Short.MAX_VALUE)
+            mapPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGap(0, 433, Short.MAX_VALUE)
         );
 
+        gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints.gridx = 0;
+        gridBagConstraints.gridy = 1;
+        gridBagConstraints.gridwidth = 2;
+        gridBagConstraints.fill = java.awt.GridBagConstraints.BOTH;
+        gridBagConstraints.ipadx = 788;
+        gridBagConstraints.ipady = 404;
+        gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHWEST;
+        gridBagConstraints.weightx = 1.0;
+        gridBagConstraints.weighty = 1.0;
+        gridBagConstraints.insets = new java.awt.Insets(6, 6, 0, 6);
+        mapContainer.add(mapPanel, gridBagConstraints);
+
+        gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints.fill = java.awt.GridBagConstraints.BOTH;
+        contentPanel.add(mapContainer, gridBagConstraints);
+        
         interpreter = new RobotInterpreter(mapPanel);
 
         controlsPanel.setLayout(new GridLayout(1, 3));
@@ -219,7 +256,6 @@ public class Window extends JFrame {
         moveTextField.setMinimumSize(new Dimension(35, 22));
         moveTextField.setName(""); // NOI18N
         moveTextField.setPreferredSize(new Dimension(35, 22));
-//        moveTextField.addActionListener(this::moveTextFieldActionPerformed);
         movePanel.add(moveTextField);
 
         moveBtn.setText("Go");
@@ -506,12 +542,13 @@ public class Window extends JFrame {
         GroupLayout actionLogPanelLayout = new GroupLayout(actionLogPanel);
         actionLogPanel.setLayout(actionLogPanelLayout);
         actionLogPanelLayout.setHorizontalGroup(
-                actionLogPanelLayout.createParallelGroup(GroupLayout.Alignment.LEADING)
-                        .addComponent(logTextFieldPanel, GroupLayout.DEFAULT_SIZE, GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                        .addGroup(GroupLayout.Alignment.TRAILING, actionLogPanelLayout.createSequentialGroup()
-                                .addContainerGap()
-                                .addComponent(logLabelPanel, GroupLayout.DEFAULT_SIZE, 258, Short.MAX_VALUE))
+            actionLogPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addComponent(logTextFieldPanel, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, actionLogPanelLayout.createSequentialGroup()
+                .addContainerGap()
+                .addComponent(logLabelPanel, javax.swing.GroupLayout.DEFAULT_SIZE, 302, Short.MAX_VALUE))
         );
+
         actionLogPanelLayout.setVerticalGroup(
                 actionLogPanelLayout.createParallelGroup(GroupLayout.Alignment.LEADING)
                         .addGroup(actionLogPanelLayout.createSequentialGroup()
@@ -522,32 +559,15 @@ public class Window extends JFrame {
 
         controlsPanel.add(actionLogPanel);
 
-        GroupLayout contentPanelLayout = new GroupLayout(contentPanel);
-        contentPanel.setLayout(contentPanelLayout);
-        contentPanelLayout.setHorizontalGroup(
-                contentPanelLayout.createParallelGroup(GroupLayout.Alignment.LEADING)
-                        .addGroup(contentPanelLayout.createSequentialGroup()
-                                .addContainerGap()
-                                .addGroup(contentPanelLayout.createParallelGroup(GroupLayout.Alignment.LEADING)
-                                        .addComponent(controlsPanel, GroupLayout.Alignment.TRAILING, GroupLayout.DEFAULT_SIZE, GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                                        .addComponent(mapPanel, GroupLayout.DEFAULT_SIZE, GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
-                                .addContainerGap())
-                        .addGroup(contentPanelLayout.createSequentialGroup()
-                                .addGap(383, 383, 383)
-                                .addComponent(mapLabel)
-                                .addContainerGap(GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
-        );
-        contentPanelLayout.setVerticalGroup(
-                contentPanelLayout.createParallelGroup(GroupLayout.Alignment.LEADING)
-                        .addGroup(contentPanelLayout.createSequentialGroup()
-                                .addContainerGap()
-                                .addComponent(mapLabel)
-                                .addPreferredGap(LayoutStyle.ComponentPlacement.RELATED)
-                                .addComponent(mapPanel, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)
-                                .addPreferredGap(LayoutStyle.ComponentPlacement.RELATED)
-                                .addComponent(controlsPanel, GroupLayout.DEFAULT_SIZE, 210, Short.MAX_VALUE)
-                                .addContainerGap())
-        );
+        gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints.gridx = 0;
+        gridBagConstraints.gridy = 2;
+        gridBagConstraints.gridwidth = 2;
+        gridBagConstraints.fill = java.awt.GridBagConstraints.BOTH;
+        gridBagConstraints.ipadx = 60;
+        gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHWEST;
+        gridBagConstraints.insets = new java.awt.Insets(6, 6, 6, 6);
+        contentPanel.add(controlsPanel, gridBagConstraints);
 
         fileMenu.setText("File");
 
@@ -599,12 +619,12 @@ public class Window extends JFrame {
         GroupLayout layout = new GroupLayout(getContentPane());
         getContentPane().setLayout(layout);
         layout.setHorizontalGroup(
-                layout.createParallelGroup(GroupLayout.Alignment.LEADING)
-                        .addComponent(contentPanel, GroupLayout.DEFAULT_SIZE, GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+            layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addComponent(contentPanel, javax.swing.GroupLayout.DEFAULT_SIZE, 1023, Short.MAX_VALUE)
         );
         layout.setVerticalGroup(
-                layout.createParallelGroup(GroupLayout.Alignment.LEADING)
-                        .addComponent(contentPanel, GroupLayout.DEFAULT_SIZE, GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+            layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addComponent(contentPanel, javax.swing.GroupLayout.DEFAULT_SIZE, 683, Short.MAX_VALUE)
         );
 
         pack();
@@ -622,7 +642,10 @@ public class Window extends JFrame {
     private void moveBtnActionPerformed(ActionEvent evt) {
         try {
             int distance = Integer.parseInt(moveTextField.getText());
-            log.logPrintln("Sending command \"move" + distance + ";\"\n");
+            if (distance == 0) {
+                throw new NumberFormatException();
+            }
+            log.logPrintln("Sending command \"move" + distance + ";\"");
             comms.sendLine("move" + distance + ";");
 
             String line = comms.readLine(5000);
@@ -630,8 +653,8 @@ public class Window extends JFrame {
             System.out.println(line); // for dedugging purposes
 
         } catch (NumberFormatException e) {
-            System.err.println("Distance must only contain numbers");
-            JOptionPane.showMessageDialog(this, "Distance must only contain numbers", "NumberFormatExcpetion", JOptionPane.ERROR_MESSAGE);
+            System.err.println("Distance must only contain non-zero numbers");
+            JOptionPane.showMessageDialog(this, "Distance may only contain non-zero numbers", "NumberFormatExcpetion", JOptionPane.ERROR_MESSAGE);
         }
     }
 

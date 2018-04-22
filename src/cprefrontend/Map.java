@@ -6,16 +6,12 @@
 package cprefrontend;
 
 import java.awt.Color;
-import java.awt.Dimension;
 import java.awt.Graphics;
 import java.awt.Point;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseMotionAdapter;
-import java.awt.event.MouseWheelEvent;
-import java.awt.event.MouseWheelListener;
 import java.util.ArrayList;
-import java.util.Arrays;
 import javax.swing.JPanel;
 
 /**
@@ -24,11 +20,10 @@ import javax.swing.JPanel;
  */
 public class Map extends JPanel {
     
-    private ArrayList<Obstacle> obstacles;
-    private ArrayList<Line> lines;
-    private ArrayList<int[]> rPositions;
-//    private final double scale = 1.0;
-    private Robot r;
+    private final ArrayList<Obstacle> obstacles;
+    private final ArrayList<Line> lines;
+    private final ArrayList<int[]> rPositions;
+    private final Robot r;
     private Point mousePt;
     private Point origin;
     
