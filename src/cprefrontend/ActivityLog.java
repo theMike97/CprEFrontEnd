@@ -6,8 +6,6 @@
 package cprefrontend;
 
 import java.awt.Color;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 import javax.swing.JTextPane;
 import javax.swing.text.AttributeSet;
 import javax.swing.text.BadLocationException;
@@ -20,12 +18,10 @@ import javax.swing.text.StyleContext;
  *
  * @author Mike
  */
-public class ActivityLogWriter {
+public class ActivityLog extends JTextPane {
     
-    JTextPane log;
-    
-    public ActivityLogWriter() {
-        log = Window.getActivityLog();
+    public ActivityLog() {
+        super();
     }
     
     public void logWriteln(String line) {
@@ -39,25 +35,34 @@ public class ActivityLogWriter {
     
     public void clearLine() {
         try {
-            Document doc = log.getDocument();
+            Document doc = getDocument();
             String content = doc.getText(0, doc.getLength());
             int linebreak = content.lastIndexOf('\n');
             linebreak = (linebreak == -1) ? 0 : linebreak;
             doc.remove(linebreak, doc.getLength() - linebreak);
         } catch (BadLocationException ex) {
-            Logger.getLogger(ActivityLogWriter.class.getName()).log(Level.SEVERE, null, ex);
+            ex.printStackTrace();
+        }
+    }
+    
+    public void clear() {
+        try {
+            Document doc = getDocument();
+            doc.remove(0, doc.getLength());
+        } catch (BadLocationException ex) {
+            ex.printStackTrace();
         }
     }
     
     public void logPrintln(String line) {
-        if (log.getDocument().getLength() > 0) {
+        if (getDocument().getLength() > 0) {
             logWriteln("\n");
         }
         logWriteln(line);
     }
     
     public void logPrintErr(String err) {
-        if (log.getDocument().getLength() > 0) {
+        if (getDocument().getLength() > 0) {
             logWriteln("\n");
         }
         append(err, 1);
@@ -69,10 +74,10 @@ public class ActivityLogWriter {
             AttributeSet aset = sc.addAttribute(SimpleAttributeSet.EMPTY, StyleConstants.FontFamily, "Lucida Console");
             aset = (status == 1) ? sc.addAttribute(aset, StyleConstants.Foreground, Color.red) : sc.addAttribute(aset, StyleConstants.Foreground, Color.black);
             
-            Document doc = log.getDocument();
+            Document doc = getDocument();
             doc.insertString(doc.getLength(), s, aset);
         } catch (BadLocationException ex) {
-            
+            ex.printStackTrace();
         }
     }
     

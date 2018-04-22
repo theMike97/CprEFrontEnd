@@ -33,7 +33,7 @@ public class Window extends JFrame {
     private JPanel CalibrationPanel;
     private JPanel actionLogPanel;
     private JScrollPane activityLogScrollPane;
-    private static JTextPane activityLogTextArea;
+    private ActivityLog log;
     private JPanel bottomLeftSpacePanel;
     private JPanel bottomRightSpacePanel;
     private JButton bottomRotateBtn;
@@ -85,7 +85,6 @@ public class Window extends JFrame {
 //    private final static String IP = "192.168.1.1";
 //    private final static int PORT = 288;
     private NetUtils comms;
-    private ActivityLogWriter writer;
     private RobotInterpreter interpreter;
 
     private int currentDirection;
@@ -135,7 +134,7 @@ public class Window extends JFrame {
         logLabel = new JLabel();
         logTextFieldPanel = new JPanel();
         activityLogScrollPane = new JScrollPane();
-        activityLogTextArea = new JTextPane();
+        log = new ActivityLog();
         menuBar = new JMenuBar();
         fileMenu = new JMenu();
         fmNewCalibrationProfileMenuItem = new JMenuItem();
@@ -151,12 +150,10 @@ public class Window extends JFrame {
         connectBtn = new JButton();
         scanBtn = new JButton();
 
-        comms = new NetUtils(this); // start socket thread
-        writer = new ActivityLogWriter();
+        comms = new NetUtils(this, log); // start socket thread
 
         currentDirection = 0;
         calibrationProfile = new CalibrationProfile();
-        hasProfile = false;
         // </editor-fold>
 
         createWindow();
@@ -483,11 +480,11 @@ public class Window extends JFrame {
         logLabel.setText("Robot Activity Log");
         logLabelPanel.add(logLabel);
 
-        activityLogTextArea.setEditable(false);
-        DefaultCaret caret = (DefaultCaret) activityLogTextArea.getCaret();
+        log.setEditable(false);
+        DefaultCaret caret = (DefaultCaret) log.getCaret();
         caret.setUpdatePolicy(DefaultCaret.ALWAYS_UPDATE);
 
-        activityLogScrollPane.setViewportView(activityLogTextArea);
+        activityLogScrollPane.setViewportView(log);
 
         GroupLayout logTextFieldPanelLayout = new GroupLayout(logTextFieldPanel);
         logTextFieldPanel.setLayout(logTextFieldPanelLayout);
@@ -620,7 +617,7 @@ public class Window extends JFrame {
     private void moveBtnActionPerformed(ActionEvent evt) {
         try {
             int distance = Integer.parseInt(moveTextField.getText());
-            writer.logPrintln("Sending command \"move" + distance + ";\"\n");
+            log.logPrintln("Sending command \"move" + distance + ";\"\n");
             comms.sendLine("move" + distance + ";");
 
         } catch (NumberFormatException e) {
@@ -660,7 +657,7 @@ public class Window extends JFrame {
             cDialog.createDialog();
             calibrationProfile = cDialog.getCalibrationProfile();
 
-            writer.logPrintln("Updated profile" + "\"" + profileName + "\"");
+            log.logPrintln("Updated profile" + "\"" + profileName + "\"");
             loadProfile(file);
         }
     }
@@ -670,10 +667,10 @@ public class Window extends JFrame {
         cDialog.createDialog();
         calibrationProfile = cDialog.getCalibrationProfile();
         if (calibrationProfile.getBot() == -1 || calibrationProfile.getName() == null) {
-            writer.logPrintErr("Invalid calibration profile");
+            log.logPrintErr("Invalid calibration profile");
             return;
         }
-        writer.logPrintln("Created calibration profile \"" + calibrationProfile.getName() + "\"");
+        log.logPrintln("Created calibration profile \"" + calibrationProfile.getName() + "\"");
         loadProfile(calibrationProfile);
     }
 
@@ -690,29 +687,54 @@ public class Window extends JFrame {
     }
 
     private void rmRestartMenuItemActionPerformed(ActionEvent evt) {
+        try {
+            log.clear();
 
+            comms.closeSocket(); // close connection
+            log.logPrintln("Socket closed");
+
+            calibrationLabel.setText("Calibration Profile: No Profile Selected");
+            calibrationLabel.setForeground(Color.red);
+            calibrationProfile.setBot(-1);
+            calibrationProfile.setName(null);
+            log.logPrintln("Unloaded calibration data");
+
+            scanBtn.setEnabled(false);
+            moveBtn.setEnabled(false);
+            topRotateBtn.setEnabled(false);
+            rightRotateBtn.setEnabled(false);
+            bottomRotateBtn.setEnabled(false);
+            leftRotateBtn.setEnabled(false);
+        } catch (IOException ex) {
+            ex.printStackTrace();
+        }
     }
 
     private void connectBtnActionPerformed(ActionEvent evt) {
-        if (comms.getSocket() == null || comms.getSocket().isClosed()) {
+        if (comms.getSocket() != null && !comms.getSocket().isClosed()) {
+
+            try {
+                int result = JOptionPane.showConfirmDialog(this, "Are you sure you want to disconnect?", "Disconnect", JOptionPane.YES_NO_OPTION);
+                if (result == 0) {
+                    comms.closeSocket();
+                    log.logPrintln("Socket closed");
+                }
+            } catch (IOException ex) {
+                ex.printStackTrace();
+            }
+        } else {
             ConnectionDialog cd = new ConnectionDialog(this);
             cd.createDialog();
             String ip = cd.getIP();
             int port = cd.getPort();
             if (!ip.equals("")) {
-                comms.setIP(ip);
-                comms.setPort(port);
-                comms.start();
-            }
-        } else {
-            try {
-                int result = JOptionPane.showConfirmDialog(this, "Are you sure you want to disconnect?", "Disconnect", JOptionPane.YES_NO_OPTION);
-                if (result == 0) {
-                    comms.closeSocket();
-                    writer.logPrintln("Socket closed");
-                }
-            } catch (IOException ex) {
-                ex.printStackTrace();
+//                try {
+                    comms.setIP(ip);
+                    comms.setPort(port);
+                    comms.createSocket();
+//                } catch (IOException ex) {
+//                    ex.printStackTrace();
+//                }
             }
         }
     }
@@ -721,53 +743,55 @@ public class Window extends JFrame {
         comms.sendLine("scan;"); // send scan command ('s')
         String line;
         line = comms.readLine(5000); // argument is time in milliseconds | this line gets total number of obstacles
-        writer.logPrintln(line);
+        log.logPrintln(line);
         int obstacles = Integer.parseInt(line);
         String[] lines = new String[obstacles];
         for (int i = 0; i < obstacles; i++) {
             lines[i] = comms.readLine(5000);
             interpreter.parseResponse(lines[i]);
-            writer.logPrintln(lines[i]);
+            log.logPrintln(lines[i]);
         }
     }
 
     private void topRotateBtnActionPerformed(ActionEvent evt) {
         robotOrientationImage.setIcon(new ImageIcon(getClass().getResource("/cprefrontend/robot-orientation-north.png")));
-        writer.logPrintln("Sending command \"rotate" + getDirection(currentDirection, Robot.NORTH) + ";\"");
+        log.logPrintln("Sending command \"rotate" + getDirection(currentDirection, Robot.NORTH) + ";\"");
+//        System.out.println("rotate" + getDirection(currentDirection, Robot.NORTH) + ";");
+        comms.sendLine("rotate" + getDirection(currentDirection, Robot.NORTH) + ";");
         currentDirection = Robot.NORTH;
         Robot.setDirection(Robot.NORTH); // use a static method because I want DIRECTION to carry accross all Robot instances
-        comms.sendLine("rotate" + getDirection(currentDirection, Robot.NORTH) + ";");
     }
 
     private void rightRotateBtnActionPerformed(ActionEvent evt) {
         robotOrientationImage.setIcon(new ImageIcon(getClass().getResource("/cprefrontend/robot-orientation-east.png")));
-        writer.logPrintln("Sending command \"rotate" + getDirection(currentDirection, Robot.EAST) + ";\"");
+        log.logPrintln("Sending command \"rotate" + getDirection(currentDirection, Robot.EAST) + ";\"");
+        comms.sendLine("rotate" + getDirection(currentDirection, Robot.EAST) + ";");
         currentDirection = Robot.EAST;
         Robot.setDirection(Robot.EAST);
-        comms.sendLine("rotate" + getDirection(currentDirection, Robot.EAST) + ";");
     }
 
     private void bottomRotateBtnActionPerformed(ActionEvent evt) {
         robotOrientationImage.setIcon(new ImageIcon(getClass().getResource("/cprefrontend/robot-orientation-south.png")));
-        writer.logPrintln("Sending command \"rotate" + getDirection(currentDirection, Robot.SOUTH) + ";\"");
+        log.logPrintln("Sending command \"rotate" + getDirection(currentDirection, Robot.SOUTH) + ";\"");
+        comms.sendLine("rotate" + getDirection(currentDirection, Robot.SOUTH) + ";");
         currentDirection = Robot.SOUTH;
         Robot.setDirection(Robot.SOUTH);
-        comms.sendLine("rotate" + getDirection(currentDirection, Robot.SOUTH) + ";");
     }
 
     private void leftRotateBtnActionPerformed(ActionEvent evt) {
         robotOrientationImage.setIcon(new ImageIcon(getClass().getResource("/cprefrontend/robot-orientation-west.png")));
-        writer.logPrintln("Sending command \"rotate" + getDirection(currentDirection, Robot.WEST) + ";\"");
+        log.logPrintln("Sending command \"rotate" + getDirection(currentDirection, Robot.WEST) + ";\"");
+        comms.sendLine("rotate" + getDirection(currentDirection, Robot.WEST) + ";");
         currentDirection = Robot.WEST;
         Robot.setDirection(Robot.WEST);
-        comms.sendLine("rotate" + getDirection(currentDirection, Robot.WEST) + ";");
     }
     // </editor-fold>
 
     private int getDirection(int cardinalDir0, int cardinalDir1) {
         int direction = (cardinalDir1 - cardinalDir0) * 90;
-        if (direction == -270) {
-            direction = 90;
+
+        if (direction < 0) {
+            direction += 360;
         }
 
         return direction;
@@ -790,13 +814,13 @@ public class Window extends JFrame {
                 try {
                     calibrationProfile.setBot(Integer.parseInt(profile[1]));
                     loadProfile(calibrationProfile);
-                    writer.logPrintln("Loaded calibration profile \"" + calibrationProfile.getName() + "\"");
+                    log.logPrintln("Loaded calibration profile \"" + calibrationProfile.getName() + "\"");
                 } catch (NumberFormatException ex) {
                     System.err.println("Profile is invalid");
                     JOptionPane.showMessageDialog(this, "Profile is invalid", "NumberFormatExcpetion", JOptionPane.ERROR_MESSAGE);
                 }
             } else {
-                writer.logPrintErr("Could not connect to target.");
+                log.logPrintErr("Could not connect to target.");
             }
 
         } catch (FileNotFoundException ex) {
@@ -821,9 +845,5 @@ public class Window extends JFrame {
         bottomRotateBtn.setEnabled(true);
         leftRotateBtn.setEnabled(true);
 
-    }
-
-    public static JTextPane getActivityLog() {
-        return activityLogTextArea;
     }
 }

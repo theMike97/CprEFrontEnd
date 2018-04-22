@@ -36,19 +36,19 @@ public class NetUtils extends Thread {
     private Socket socket;
     private BufferedReader br;
     private DataOutputStream os;
-    private ActivityLogWriter writer;
+    private ActivityLog log;
 
-    public NetUtils(JFrame parent) {
+    public NetUtils(JFrame parent, ActivityLog log) {
+        this.log = log;
         this.parent = parent;
-        writer = new ActivityLogWriter();
         br = null;
         os = null;
         ip = null;
         port = 0;
     }
 
-    public NetUtils(JFrame parent, String ip, int port) {
-        this(parent);
+    public NetUtils(JFrame parent, ActivityLog log, String ip, int port) {
+        this(parent, log);
         this.ip = ip;
         this.port = port;
     }
@@ -59,24 +59,9 @@ public class NetUtils extends Thread {
      */
     @Override
     public void run() {
-        writer = new ActivityLogWriter();
-        try {
-            socket = new Socket();
-            socket.connect(new InetSocketAddress(ip, port), 500);
-            System.out.println("Socket connected " + socket);
-            writer.logPrintln("Socket connected");
-
-            br = new BufferedReader(new InputStreamReader(socket.getInputStream()));
-            os = new DataOutputStream(socket.getOutputStream());
-
-        } catch (SocketTimeoutException e) {
-            JOptionPane.showMessageDialog(parent, "Connection timed out!\nCheck your IP and port.", "SocketTimeoutException", JOptionPane.ERROR_MESSAGE);
-
-        } catch (IOException ex) {
-            JOptionPane.showMessageDialog(parent, "Could not connect!\nCheck your IP and port.", "IOException", JOptionPane.ERROR_MESSAGE);
-        }
+        createSocket();
     }
-    
+
     /**
      * Returns field socket
      *
@@ -87,7 +72,29 @@ public class NetUtils extends Thread {
     }
 
     /**
-     * Closes socket and InputStreamReader
+     * Creates new Socket, BufferedReader, and DataOutputStream for connecting to
+     * a target server, reading incoming data, and writing outgoing data.     * 
+     */
+    public void createSocket() {
+        try {
+            socket = new Socket();
+            socket.connect(new InetSocketAddress(ip, port), 500);
+            System.out.println("Socket connected " + socket);
+            log.logPrintln("Socket connected");
+
+            br = new BufferedReader(new InputStreamReader(socket.getInputStream()));
+            os = new DataOutputStream(socket.getOutputStream());
+            
+        } catch (SocketTimeoutException e) {
+            JOptionPane.showMessageDialog(parent, "Connection timed out!\nCheck your IP and port.", "SocketTimeoutException", JOptionPane.ERROR_MESSAGE);
+
+        } catch (IOException ex) {
+            JOptionPane.showMessageDialog(parent, "Could not connect!\nCheck your IP and port.", "IOException", JOptionPane.ERROR_MESSAGE);
+        }
+    }
+
+    /**
+     * Closes socket, BufferedReader, and DataOutputStream
      *
      * @throws IOException
      */
@@ -103,6 +110,11 @@ public class NetUtils extends Thread {
         socket.close();
     }
 
+    /**
+     * Sends a String via socket to IP:port
+     * 
+     * @param command String to send
+     */
     public void sendLine(String command) {
         for (int i = 0; i < command.length(); i++) {
             sendChar(command.charAt(i));
@@ -111,12 +123,17 @@ public class NetUtils extends Thread {
 //            os.flush();
     }
 
+    /**
+     * Sends a character via socket to IP:port
+     * 
+     * @param c character to send
+     */
     public void sendChar(char c) {
         try {
             os.writeByte(c);
             os.flush();
         } catch (IOException ex) {
-            Logger.getLogger(NetUtils.class.getName()).log(Level.SEVERE, null, ex);
+            ex.printStackTrace();
         }
     }
 
@@ -127,7 +144,7 @@ public class NetUtils extends Thread {
      * @return String from byte stream
      * @throws java.net.SocketException
      */
-    public String readLine(int timeout) {
+    public String readLine(long timeout) {
 
         String line = "";
         long startTime = System.currentTimeMillis();
