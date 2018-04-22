@@ -24,3 +24,5 @@ hs_err_pid*
 # Directories
 /build/
 /nbproject/
+/src/planner/
+/src/testClient
