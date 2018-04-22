@@ -157,7 +157,7 @@ public class Map extends JPanel {
         
         // loop through lines and obstacles and paint
         for (Line line : lines) {
-//            g.drawLine(line.x1, line.y1, line.x2, line.y2);
+            g.drawLine(line.x1, line.y1, line.x2, line.y2);
         }
         
         for (Obstacle obstacle : obstacles) {
@@ -167,7 +167,7 @@ public class Map extends JPanel {
         
         g.setColor(Color.green);
         // draw robot
-        g.drawOval(
+        g.fillOval(
                 getOvalCoords(r.getPosition()[0], r.getPosition()[1], Robot.DIAMETER)[0], 
                 getOvalCoords(r.getPosition()[0], r.getPosition()[1], Robot.DIAMETER)[1], 
                 Robot.DIAMETER, 

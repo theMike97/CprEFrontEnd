@@ -76,7 +76,7 @@ public class NetUtils extends Thread {
             JOptionPane.showMessageDialog(parent, "Could not connect!\nCheck your IP and port.", "IOException", JOptionPane.ERROR_MESSAGE);
         }
     }
-
+    
     /**
      * Returns field socket
      *
@@ -95,17 +95,25 @@ public class NetUtils extends Thread {
         // close output stream writer
         os.flush();
         os.close();
-        
+
         //close input stream reader
         br.close();
-        
+
         // close socket
         socket.close();
     }
 
-    public void sendLine(char command) {
+    public void sendLine(String command) {
+        for (int i = 0; i < command.length(); i++) {
+            sendChar(command.charAt(i));
+        }
+//            os.writeChars(command);
+//            os.flush();
+    }
+
+    public void sendChar(char c) {
         try {
-            os.writeByte(command);
+            os.writeByte(c);
             os.flush();
         } catch (IOException ex) {
             Logger.getLogger(NetUtils.class.getName()).log(Level.SEVERE, null, ex);
@@ -123,11 +131,11 @@ public class NetUtils extends Thread {
 
         String line = "";
         long startTime = System.currentTimeMillis();
-        
+
         try {
-            
+
             int i;
-            
+
             while ((i = br.read()) != ';' && (System.currentTimeMillis() - startTime) < timeout) { // ';'
                 char c = (char) i;
                 line += c;

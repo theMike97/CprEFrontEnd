@@ -5,11 +5,16 @@
  */
 package cprefrontend;
 
+import java.awt.Color;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-import javax.swing.JTextArea;
+import javax.swing.JTextPane;
+import javax.swing.text.AttributeSet;
 import javax.swing.text.BadLocationException;
 import javax.swing.text.Document;
+import javax.swing.text.SimpleAttributeSet;
+import javax.swing.text.StyleConstants;
+import javax.swing.text.StyleContext;
 
 /**
  *
@@ -17,14 +22,14 @@ import javax.swing.text.Document;
  */
 public class ActivityLogWriter {
     
-    JTextArea log;
+    JTextPane log;
     
     public ActivityLogWriter() {
         log = Window.getActivityLog();
     }
     
     public void logWriteln(String line) {
-        log.append(line);
+        append(line, 0);
     }
     
     public void logOverwriteln(String line) {
@@ -48,7 +53,27 @@ public class ActivityLogWriter {
         if (log.getDocument().getLength() > 0) {
             logWriteln("\n");
         }
-            log.append(line);
+        logWriteln(line);
+    }
+    
+    public void logPrintErr(String err) {
+        if (log.getDocument().getLength() > 0) {
+            logWriteln("\n");
+        }
+        append(err, 1);
+    }
+    
+    private void append(String s, int status) {
+        try {
+            StyleContext sc = StyleContext.getDefaultStyleContext();
+            AttributeSet aset = sc.addAttribute(SimpleAttributeSet.EMPTY, StyleConstants.FontFamily, "Lucida Console");
+            aset = (status == 1) ? sc.addAttribute(aset, StyleConstants.Foreground, Color.red) : sc.addAttribute(aset, StyleConstants.Foreground, Color.black);
+            
+            Document doc = log.getDocument();
+            doc.insertString(doc.getLength(), s, aset);
+        } catch (BadLocationException ex) {
+            
+        }
     }
     
 }
