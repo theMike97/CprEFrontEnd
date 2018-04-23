@@ -150,13 +150,11 @@ public class NetUtils extends Thread {
 //        long startTime = System.currentTimeMillis();
 
         try {
-
             int i;
-
             while ((i = br.read()) != ';') { // ';'
                 char c = (char) i;
                 line += c;
-//                System.out.print(c);
+                System.out.print(c);
             }
 //            System.out.println("here");
         } catch (IOException ex) {

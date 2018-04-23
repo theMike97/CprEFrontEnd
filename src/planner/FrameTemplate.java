@@ -52,9 +52,11 @@ public class FrameTemplate extends javax.swing.JFrame {
         westRadioButton = new javax.swing.JRadioButton();
         rotateControlPanel = new javax.swing.JPanel();
         topLeftSpacePanel = new javax.swing.JPanel();
+        topLeftRotateBtn = new javax.swing.JButton();
         topRotatePanel = new javax.swing.JPanel();
         topRotateBtn = new javax.swing.JButton();
         topRightSpacePanel = new javax.swing.JPanel();
+        topRightRotateBtn = new javax.swing.JButton();
         leftRotatePanel = new javax.swing.JPanel();
         leftRotateBtn = new javax.swing.JButton();
         centerOrientationPanel = new javax.swing.JPanel();
@@ -63,9 +65,11 @@ public class FrameTemplate extends javax.swing.JFrame {
         rightRotatePanel = new javax.swing.JPanel();
         rightRotateBtn = new javax.swing.JButton();
         bottomLeftSpacePanel = new javax.swing.JPanel();
+        bottomLeftRotateBtn = new javax.swing.JButton();
         bottomRotatePanel = new javax.swing.JPanel();
         bottomRotateBtn = new javax.swing.JButton();
         bottomRightSpacePanel = new javax.swing.JPanel();
+        bottomRightRotateBtn = new javax.swing.JButton();
         actionLogPanel = new javax.swing.JPanel();
         logLabelPanel = new javax.swing.JPanel();
         logLabel = new javax.swing.JLabel();
@@ -223,15 +227,32 @@ public class FrameTemplate extends javax.swing.JFrame {
 
         rotateControlPanel.setLayout(new java.awt.GridBagLayout());
 
+        topLeftRotateBtn.setIcon(new javax.swing.ImageIcon(getClass().getResource("/cprefrontend/direction-arrow-left-top.png"))); // NOI18N
+        topLeftRotateBtn.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                topLeftRotateBtnActionPerformed(evt);
+            }
+        });
+
         javax.swing.GroupLayout topLeftSpacePanelLayout = new javax.swing.GroupLayout(topLeftSpacePanel);
         topLeftSpacePanel.setLayout(topLeftSpacePanelLayout);
         topLeftSpacePanelLayout.setHorizontalGroup(
             topLeftSpacePanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGap(0, 0, Short.MAX_VALUE)
+            .addGroup(topLeftSpacePanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                .addGroup(topLeftSpacePanelLayout.createSequentialGroup()
+                    .addGap(0, 0, Short.MAX_VALUE)
+                    .addComponent(topLeftRotateBtn)
+                    .addGap(0, 0, Short.MAX_VALUE)))
         );
         topLeftSpacePanelLayout.setVerticalGroup(
             topLeftSpacePanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGap(0, 0, Short.MAX_VALUE)
+            .addGroup(topLeftSpacePanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                .addGroup(topLeftSpacePanelLayout.createSequentialGroup()
+                    .addGap(0, 0, Short.MAX_VALUE)
+                    .addComponent(topLeftRotateBtn)
+                    .addGap(0, 0, Short.MAX_VALUE)))
         );
 
         rotateControlPanel.add(topLeftSpacePanel, new java.awt.GridBagConstraints());
@@ -266,15 +287,27 @@ public class FrameTemplate extends javax.swing.JFrame {
 
         rotateControlPanel.add(topRotatePanel, new java.awt.GridBagConstraints());
 
+        topRightRotateBtn.setIcon(new javax.swing.ImageIcon(getClass().getResource("/cprefrontend/direction-arrow-right-top.png"))); // NOI18N
+
         javax.swing.GroupLayout topRightSpacePanelLayout = new javax.swing.GroupLayout(topRightSpacePanel);
         topRightSpacePanel.setLayout(topRightSpacePanelLayout);
         topRightSpacePanelLayout.setHorizontalGroup(
             topRightSpacePanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGap(0, 0, Short.MAX_VALUE)
+            .addGroup(topRightSpacePanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                .addGroup(topRightSpacePanelLayout.createSequentialGroup()
+                    .addGap(0, 0, Short.MAX_VALUE)
+                    .addComponent(topRightRotateBtn)
+                    .addGap(0, 0, Short.MAX_VALUE)))
         );
         topRightSpacePanelLayout.setVerticalGroup(
             topRightSpacePanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGap(0, 0, Short.MAX_VALUE)
+            .addGroup(topRightSpacePanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                .addGroup(topRightSpacePanelLayout.createSequentialGroup()
+                    .addGap(0, 0, Short.MAX_VALUE)
+                    .addComponent(topRightRotateBtn)
+                    .addGap(0, 0, Short.MAX_VALUE)))
         );
 
         rotateControlPanel.add(topRightSpacePanel, new java.awt.GridBagConstraints());
@@ -375,15 +408,32 @@ public class FrameTemplate extends javax.swing.JFrame {
         gridBagConstraints.gridy = 1;
         rotateControlPanel.add(rightRotatePanel, gridBagConstraints);
 
+        bottomLeftRotateBtn.setIcon(new javax.swing.ImageIcon(getClass().getResource("/cprefrontend/direction-arrow-bottom-left.png"))); // NOI18N
+        bottomLeftRotateBtn.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                bottomLeftRotateBtnActionPerformed(evt);
+            }
+        });
+
         javax.swing.GroupLayout bottomLeftSpacePanelLayout = new javax.swing.GroupLayout(bottomLeftSpacePanel);
         bottomLeftSpacePanel.setLayout(bottomLeftSpacePanelLayout);
         bottomLeftSpacePanelLayout.setHorizontalGroup(
             bottomLeftSpacePanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGap(0, 0, Short.MAX_VALUE)
+            .addGroup(bottomLeftSpacePanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                .addGroup(bottomLeftSpacePanelLayout.createSequentialGroup()
+                    .addGap(0, 0, Short.MAX_VALUE)
+                    .addComponent(bottomLeftRotateBtn)
+                    .addGap(0, 0, Short.MAX_VALUE)))
         );
         bottomLeftSpacePanelLayout.setVerticalGroup(
             bottomLeftSpacePanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGap(0, 0, Short.MAX_VALUE)
+            .addGroup(bottomLeftSpacePanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                .addGroup(bottomLeftSpacePanelLayout.createSequentialGroup()
+                    .addGap(0, 0, Short.MAX_VALUE)
+                    .addComponent(bottomLeftRotateBtn)
+                    .addGap(0, 0, Short.MAX_VALUE)))
         );
 
         gridBagConstraints = new java.awt.GridBagConstraints();
@@ -422,15 +472,27 @@ public class FrameTemplate extends javax.swing.JFrame {
         gridBagConstraints.gridy = 2;
         rotateControlPanel.add(bottomRotatePanel, gridBagConstraints);
 
+        bottomRightRotateBtn.setIcon(new javax.swing.ImageIcon(getClass().getResource("/cprefrontend/direction-arrow-right-bottom.png"))); // NOI18N
+
         javax.swing.GroupLayout bottomRightSpacePanelLayout = new javax.swing.GroupLayout(bottomRightSpacePanel);
         bottomRightSpacePanel.setLayout(bottomRightSpacePanelLayout);
         bottomRightSpacePanelLayout.setHorizontalGroup(
             bottomRightSpacePanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGap(0, 0, Short.MAX_VALUE)
+            .addGroup(bottomRightSpacePanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                .addGroup(bottomRightSpacePanelLayout.createSequentialGroup()
+                    .addGap(0, 0, Short.MAX_VALUE)
+                    .addComponent(bottomRightRotateBtn)
+                    .addGap(0, 0, Short.MAX_VALUE)))
         );
         bottomRightSpacePanelLayout.setVerticalGroup(
             bottomRightSpacePanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGap(0, 0, Short.MAX_VALUE)
+            .addGroup(bottomRightSpacePanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                .addGroup(bottomRightSpacePanelLayout.createSequentialGroup()
+                    .addGap(0, 0, Short.MAX_VALUE)
+                    .addComponent(bottomRightRotateBtn)
+                    .addGap(0, 0, Short.MAX_VALUE)))
         );
 
         gridBagConstraints = new java.awt.GridBagConstraints();
@@ -465,7 +527,7 @@ public class FrameTemplate extends javax.swing.JFrame {
             .addComponent(logTextFieldPanel, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
             .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, actionLogPanelLayout.createSequentialGroup()
                 .addContainerGap()
-                .addComponent(logLabelPanel, javax.swing.GroupLayout.DEFAULT_SIZE, 302, Short.MAX_VALUE))
+                .addComponent(logLabelPanel, javax.swing.GroupLayout.DEFAULT_SIZE, 346, Short.MAX_VALUE))
         );
         actionLogPanelLayout.setVerticalGroup(
             actionLogPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -532,7 +594,7 @@ public class FrameTemplate extends javax.swing.JFrame {
         getContentPane().setLayout(layout);
         layout.setHorizontalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addComponent(contentPanel, javax.swing.GroupLayout.DEFAULT_SIZE, 1023, Short.MAX_VALUE)
+            .addComponent(contentPanel, javax.swing.GroupLayout.DEFAULT_SIZE, 1068, Short.MAX_VALUE)
         );
         layout.setVerticalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -578,6 +640,14 @@ public class FrameTemplate extends javax.swing.JFrame {
         // TODO add your handling code here:
     }//GEN-LAST:event_fmNewCalibrationProfileMenuItemActionPerformed
 
+    private void topLeftRotateBtnActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_topLeftRotateBtnActionPerformed
+        // TODO add your handling code here:
+    }//GEN-LAST:event_topLeftRotateBtnActionPerformed
+
+    private void bottomLeftRotateBtnActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_bottomLeftRotateBtnActionPerformed
+        // TODO add your handling code here:
+    }//GEN-LAST:event_bottomLeftRotateBtnActionPerformed
+
     /**
      * @param args the command line arguments
      */
@@ -620,7 +690,9 @@ public class FrameTemplate extends javax.swing.JFrame {
     private javax.swing.JPanel actionLogPanel;
     private javax.swing.JScrollPane activityLogScrollPane;
     private javax.swing.JTextPane activityLogTextArea;
+    private javax.swing.JButton bottomLeftRotateBtn;
     private javax.swing.JPanel bottomLeftSpacePanel;
+    private javax.swing.JButton bottomRightRotateBtn;
     private javax.swing.JPanel bottomRightSpacePanel;
     private javax.swing.JButton bottomRotateBtn;
     private javax.swing.JPanel bottomRotatePanel;
@@ -663,7 +735,9 @@ public class FrameTemplate extends javax.swing.JFrame {
     private javax.swing.JRadioButton southRadioButton;
     private javax.swing.ButtonGroup startDirectionGroup;
     private javax.swing.JPanel startDirectionGroupPanel;
+    private javax.swing.JButton topLeftRotateBtn;
     private javax.swing.JPanel topLeftSpacePanel;
+    private javax.swing.JButton topRightRotateBtn;
     private javax.swing.JPanel topRightSpacePanel;
     private javax.swing.JButton topRotateBtn;
     private javax.swing.JPanel topRotatePanel;

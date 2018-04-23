@@ -33,6 +33,11 @@ public class ActivityLog extends JTextPane {
         logPrintln(line);
     }
     
+    public void logErrOverwriteln(String line) {
+        clearLine();
+        logPrintErr(line);
+    }
+    
     public void clearLine() {
         try {
             Document doc = getDocument();

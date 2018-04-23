@@ -72,6 +72,7 @@ public class Window extends JFrame {
     private JLabel moveLabel;
     private JPanel movePanel;
     private JTextField moveTextField;
+    private JButton musicBtn;
     private JButton rightRotateBtn;
     private JPanel rightRotatePanel;
     private JMenuItem rmRestartMenuItem;
@@ -86,6 +87,11 @@ public class Window extends JFrame {
     private JPanel topRotatePanel;
     private JButton scanBtn;
     private JFrame frame;
+    
+    private JButton bottomRightRotateBtn;
+    private JButton bottomLeftRotateBtn;
+    private JButton topRightRotateBtn;
+    private JButton topLeftRotateBtn;
     // End GUI
 
     // Logic
@@ -93,7 +99,7 @@ public class Window extends JFrame {
 //    private final static int PORT = 288;
     private NetUtils comms;
     private RobotInterpreter interpreter;
-
+    
     private int currentDirection;
     protected CalibrationProfile calibrationProfile;
     private boolean hasProfile;
@@ -161,7 +167,13 @@ public class Window extends JFrame {
         connectBtn = new JButton();
         scanBtn = new JButton();
         frame = this;
-
+        musicBtn = new JButton();
+        
+        bottomRightRotateBtn = new JButton();
+        bottomLeftRotateBtn = new JButton();
+        topRightRotateBtn = new JButton();
+        topLeftRotateBtn = new JButton();
+        
         comms = new NetUtils(this, log); // start socket thread
 
         currentDirection = 0;
@@ -170,13 +182,13 @@ public class Window extends JFrame {
 
         createWindow();
     }
-
+    
     @SuppressWarnings("unchecked")
     private void createWindow() {
 
         // <editor-fold defaultstate="collapsed" desc="GUI Code">        
         GridBagConstraints gridBagConstraints;
-
+        
         setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);
         addWindowListener(new WindowAdapter() {
             @Override
@@ -196,29 +208,29 @@ public class Window extends JFrame {
         setMinimumSize(new Dimension(1000, 783));
         setName("outsideFrame"); // NOI18N
         setResizable(true);
-
+        
         java.awt.GridBagLayout contentPanelLayout = new java.awt.GridBagLayout();
         contentPanelLayout.rowHeights = new int[]{75, 10, 250, 10};
         contentPanelLayout.columnWeights = new double[]{1.0};
         contentPanelLayout.rowWeights = new double[]{1.0};
         contentPanel.setLayout(contentPanelLayout);
-
+        
         java.awt.GridBagLayout jPanel2Layout = new java.awt.GridBagLayout();
         jPanel2Layout.columnWeights = new double[]{1.0};
         mapContainer.setLayout(jPanel2Layout);
-
+        
         mapLabel.setFont(new Font("Tahoma", 1, 13)); // NOI18N
         mapLabel.setText("Playing Field");
         mapLabelContainer.add(mapLabel);
-
+        
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
         gridBagConstraints.weightx = 1.0;
         mapContainer.add(mapLabelContainer, gridBagConstraints);
-
+        
         mapPanel.setBackground(new Color(255, 255, 255));
         mapPanel.setBorder(BorderFactory.createEtchedBorder());
-
+        
         GroupLayout mapPanelLayout = new GroupLayout(mapPanel);
         mapPanel.setLayout(mapPanelLayout);
         mapPanelLayout.setHorizontalGroup(
@@ -229,7 +241,7 @@ public class Window extends JFrame {
                 mapPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                         .addGap(0, 433, Short.MAX_VALUE)
         );
-
+        
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 0;
         gridBagConstraints.gridy = 1;
@@ -242,35 +254,35 @@ public class Window extends JFrame {
         gridBagConstraints.weighty = 1.0;
         gridBagConstraints.insets = new java.awt.Insets(6, 6, 0, 6);
         mapContainer.add(mapPanel, gridBagConstraints);
-
+        
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.fill = java.awt.GridBagConstraints.BOTH;
         contentPanel.add(mapContainer, gridBagConstraints);
-
-        interpreter = new RobotInterpreter(mapPanel);
-
+        
+        interpreter = new RobotInterpreter(mapPanel, log);
+        
         controlsPanel.setLayout(new GridLayout(1, 3));
-
+        
         movePanel.setLayout(new FlowLayout(FlowLayout.LEFT));
-
+        
         moveLabel.setText("Linear Move (cm):");
         movePanel.add(moveLabel);
-
+        
         moveTextField.setText("0");
         moveTextField.setMinimumSize(new Dimension(35, 22));
         moveTextField.setName(""); // NOI18N
         moveTextField.setPreferredSize(new Dimension(35, 22));
         movePanel.add(moveTextField);
-
+        
         moveBtn.setText("Go");
         moveBtn.addActionListener(this::moveBtnActionPerformed);
         moveBtn.setEnabled(hasProfile);
         movePanel.add(moveBtn);
-
+        
         calibrationPanel.setLayout(new GridLayout(2, 0));
-
+        
         calibrationLabelPanel.setLayout(new FlowLayout(FlowLayout.LEFT));
-
+        
         String profileName = calibrationProfile.getName();
         if (profileName == null) {
             profileName = "No Profile Selected";
@@ -281,21 +293,26 @@ public class Window extends JFrame {
         calibrationLabel.setText("Calibration Profile: " + profileName);
         calibrationLabelPanel.add(calibrationLabel);
         calibrationPanel.add(calibrationLabelPanel);
-
+        
         connectBtnPanel.setLayout(new FlowLayout(FlowLayout.LEFT));
-
+        
         connectBtn.setText("Connect/Disconnect");
         connectBtn.addActionListener(this::connectBtnActionPerformed);
         connectBtnPanel.add(connectBtn);
         calibrationPanel.add(connectBtnPanel);
-
+        
         scanConnectPanel.setLayout(new FlowLayout(FlowLayout.LEFT));
-
+        
         scanBtn.setText("Scan");
         scanBtn.setEnabled(false);
         scanBtn.addActionListener(this::scanBtnActionPerformed);
         scanConnectPanel.add(scanBtn);
-
+        
+        musicBtn.setText("Play music");
+        musicBtn.setEnabled(false);
+        musicBtn.addActionListener(this::musicBtnActionPerformed);
+        scanConnectPanel.add(musicBtn);
+        
         GroupLayout leftControlPanelLayout = new GroupLayout(leftControlPanel);
         leftControlPanel.setLayout(leftControlPanelLayout);
         leftControlPanelLayout.setHorizontalGroup(
@@ -317,28 +334,43 @@ public class Window extends JFrame {
                                 .addPreferredGap(LayoutStyle.ComponentPlacement.RELATED, GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                                 .addComponent(scanConnectPanel, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE))
         );
-
+        
         controlsPanel.add(leftControlPanel);
-
+        
         rotateControlPanel.setLayout(new GridBagLayout());
-
+        
+        ImageIcon icon = new ImageIcon(getClass().getResource("/cprefrontend/direction-arrow-left-top.png"));        
+        topLeftRotateBtn.setIcon(icon);
+        topLeftRotateBtn.addActionListener(this::topLeftRotateBtnActionPerformed);
+        topLeftRotateBtn.setEnabled(false);
+        
         GroupLayout topLeftSpacePanelLayout = new GroupLayout(topLeftSpacePanel);
         topLeftSpacePanel.setLayout(topLeftSpacePanelLayout);
         topLeftSpacePanelLayout.setHorizontalGroup(
-                topLeftSpacePanelLayout.createParallelGroup(GroupLayout.Alignment.LEADING)
+                topLeftSpacePanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                         .addGap(0, 0, Short.MAX_VALUE)
+                        .addGroup(topLeftSpacePanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                                .addGroup(topLeftSpacePanelLayout.createSequentialGroup()
+                                        .addGap(0, 0, Short.MAX_VALUE)
+                                        .addComponent(topLeftRotateBtn)
+                                        .addGap(0, 0, Short.MAX_VALUE)))
         );
         topLeftSpacePanelLayout.setVerticalGroup(
-                topLeftSpacePanelLayout.createParallelGroup(GroupLayout.Alignment.LEADING)
+                topLeftSpacePanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                         .addGap(0, 0, Short.MAX_VALUE)
+                        .addGroup(topLeftSpacePanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                                .addGroup(topLeftSpacePanelLayout.createSequentialGroup()
+                                        .addGap(0, 0, Short.MAX_VALUE)
+                                        .addComponent(topLeftRotateBtn)
+                                        .addGap(0, 0, Short.MAX_VALUE)))
         );
-
+        
         rotateControlPanel.add(topLeftSpacePanel, new GridBagConstraints());
-
+        
         topRotateBtn.setIcon(new ImageIcon(getClass().getResource("/cprefrontend/direction-arrow-up.png"))); // NOI18N
         topRotateBtn.addActionListener(this::topRotateBtnActionPerformed);
-        topRotateBtn.setEnabled(hasProfile);
-
+        topRotateBtn.setEnabled(false);
+        
         GroupLayout topRotatePanelLayout = new GroupLayout(topRotatePanel);
         topRotatePanel.setLayout(topRotatePanelLayout);
         topRotatePanelLayout.setHorizontalGroup(
@@ -359,26 +391,40 @@ public class Window extends JFrame {
                                         .addComponent(topRotateBtn)
                                         .addGap(0, 0, Short.MAX_VALUE)))
         );
-
+        
         rotateControlPanel.add(topRotatePanel, new GridBagConstraints());
-
+        
+        topRightRotateBtn.setIcon(new javax.swing.ImageIcon(getClass().getResource("/cprefrontend/direction-arrow-right-top.png"))); // NOI18N
+        topRightRotateBtn.addActionListener(this::topRightRotateBtnActionPerformed);
+        topRightRotateBtn.setEnabled(false);
+        
         GroupLayout topRightSpacePanelLayout = new GroupLayout(topRightSpacePanel);
         topRightSpacePanel.setLayout(topRightSpacePanelLayout);
         topRightSpacePanelLayout.setHorizontalGroup(
-                topRightSpacePanelLayout.createParallelGroup(GroupLayout.Alignment.LEADING)
+                topRightSpacePanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                         .addGap(0, 0, Short.MAX_VALUE)
+                        .addGroup(topRightSpacePanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                                .addGroup(topRightSpacePanelLayout.createSequentialGroup()
+                                        .addGap(0, 0, Short.MAX_VALUE)
+                                        .addComponent(topRightRotateBtn)
+                                        .addGap(0, 0, Short.MAX_VALUE)))
         );
         topRightSpacePanelLayout.setVerticalGroup(
-                topRightSpacePanelLayout.createParallelGroup(GroupLayout.Alignment.LEADING)
+                topRightSpacePanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                         .addGap(0, 0, Short.MAX_VALUE)
+                        .addGroup(topRightSpacePanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                                .addGroup(topRightSpacePanelLayout.createSequentialGroup()
+                                        .addGap(0, 0, Short.MAX_VALUE)
+                                        .addComponent(topRightRotateBtn)
+                                        .addGap(0, 0, Short.MAX_VALUE)))
         );
-
+        
         rotateControlPanel.add(topRightSpacePanel, new GridBagConstraints());
-
+        
         leftRotateBtn.setIcon(new ImageIcon(getClass().getResource("/cprefrontend/direction-arrow-left.png"))); // NOI18N
         leftRotateBtn.addActionListener(this::leftRotateBtnActionPerformed);
         leftRotateBtn.setEnabled(hasProfile);
-
+        
         GroupLayout leftRotatePanelLayout = new GroupLayout(leftRotatePanel);
         leftRotatePanel.setLayout(leftRotatePanelLayout);
         leftRotatePanelLayout.setHorizontalGroup(
@@ -395,13 +441,13 @@ public class Window extends JFrame {
                                 .addComponent(leftRotateBtn)
                                 .addGap(0, 0, Short.MAX_VALUE))
         );
-
+        
         gridBagConstraints = new GridBagConstraints();
         gridBagConstraints.gridy = 1;
         rotateControlPanel.add(leftRotatePanel, gridBagConstraints);
-
+        
         robotOrientationPanel.setMinimumSize(new Dimension(80, 80));
-
+        
         robotOrientationImage.setIcon(new ImageIcon(getClass().getResource("/cprefrontend/robot-orientation-north.png"))); // NOI18N
 
         GroupLayout robotOrientationPanelLayout = new GroupLayout(robotOrientationPanel);
@@ -414,7 +460,7 @@ public class Window extends JFrame {
                 robotOrientationPanelLayout.createParallelGroup(GroupLayout.Alignment.LEADING)
                         .addComponent(robotOrientationImage, GroupLayout.DEFAULT_SIZE, GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
         );
-
+        
         GroupLayout centerOrientationPanelLayout = new GroupLayout(centerOrientationPanel);
         centerOrientationPanel.setLayout(centerOrientationPanelLayout);
         centerOrientationPanelLayout.setHorizontalGroup(
@@ -431,15 +477,15 @@ public class Window extends JFrame {
                                 .addComponent(robotOrientationPanel, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)
                                 .addContainerGap(GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
         );
-
+        
         gridBagConstraints = new GridBagConstraints();
         gridBagConstraints.gridy = 1;
         rotateControlPanel.add(centerOrientationPanel, gridBagConstraints);
-
+        
         rightRotateBtn.setIcon(new ImageIcon(getClass().getResource("/cprefrontend/direction-arrow-right.png"))); // NOI18N
         rightRotateBtn.addActionListener(this::rightRotateBtnActionPerformed);
         rightRotateBtn.setEnabled(hasProfile);
-
+        
         GroupLayout rightRotatePanelLayout = new GroupLayout(rightRotatePanel);
         rightRotatePanel.setLayout(rightRotatePanelLayout);
         rightRotatePanelLayout.setHorizontalGroup(
@@ -460,30 +506,44 @@ public class Window extends JFrame {
                                         .addComponent(rightRotateBtn)
                                         .addGap(0, 0, Short.MAX_VALUE)))
         );
-
+        
         gridBagConstraints = new GridBagConstraints();
         gridBagConstraints.gridy = 1;
         rotateControlPanel.add(rightRotatePanel, gridBagConstraints);
-
-        GroupLayout bottomLeftSpacePanelLayout = new GroupLayout(bottomLeftSpacePanel);
+        
+        bottomLeftRotateBtn.setIcon(new javax.swing.ImageIcon(getClass().getResource("/cprefrontend/direction-arrow-bottom-left.png"))); // NOI18N
+        bottomLeftRotateBtn.addActionListener(this::bottomLeftRotateBtnActionPerformed);
+        bottomLeftRotateBtn.setEnabled(false);
+        
+        javax.swing.GroupLayout bottomLeftSpacePanelLayout = new javax.swing.GroupLayout(bottomLeftSpacePanel);
         bottomLeftSpacePanel.setLayout(bottomLeftSpacePanelLayout);
         bottomLeftSpacePanelLayout.setHorizontalGroup(
-                bottomLeftSpacePanelLayout.createParallelGroup(GroupLayout.Alignment.LEADING)
+                bottomLeftSpacePanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                         .addGap(0, 0, Short.MAX_VALUE)
+                        .addGroup(bottomLeftSpacePanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                                .addGroup(bottomLeftSpacePanelLayout.createSequentialGroup()
+                                        .addGap(0, 0, Short.MAX_VALUE)
+                                        .addComponent(bottomLeftRotateBtn)
+                                        .addGap(0, 0, Short.MAX_VALUE)))
         );
         bottomLeftSpacePanelLayout.setVerticalGroup(
-                bottomLeftSpacePanelLayout.createParallelGroup(GroupLayout.Alignment.LEADING)
+                bottomLeftSpacePanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                         .addGap(0, 0, Short.MAX_VALUE)
+                        .addGroup(bottomLeftSpacePanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                                .addGroup(bottomLeftSpacePanelLayout.createSequentialGroup()
+                                        .addGap(0, 0, Short.MAX_VALUE)
+                                        .addComponent(bottomLeftRotateBtn)
+                                        .addGap(0, 0, Short.MAX_VALUE)))
         );
-
+        
         gridBagConstraints = new GridBagConstraints();
         gridBagConstraints.gridy = 2;
         rotateControlPanel.add(bottomLeftSpacePanel, gridBagConstraints);
-
+        
         bottomRotateBtn.setIcon(new ImageIcon(getClass().getResource("/cprefrontend/direction-arrow-down.png"))); // NOI18N
         bottomRotateBtn.addActionListener(this::bottomRotateBtnActionPerformed);
         bottomRotateBtn.setEnabled(hasProfile);
-
+        
         GroupLayout bottomRotatePanelLayout = new GroupLayout(bottomRotatePanel);
         bottomRotatePanel.setLayout(bottomRotatePanelLayout);
         bottomRotatePanelLayout.setHorizontalGroup(
@@ -504,38 +564,52 @@ public class Window extends JFrame {
                                         .addComponent(bottomRotateBtn)
                                         .addGap(0, 0, Short.MAX_VALUE)))
         );
-
+        
         gridBagConstraints = new GridBagConstraints();
         gridBagConstraints.gridy = 2;
         rotateControlPanel.add(bottomRotatePanel, gridBagConstraints);
-
-        GroupLayout bottomRightSpacePanelLayout = new GroupLayout(bottomRightSpacePanel);
+        
+        bottomRightRotateBtn.setIcon(new javax.swing.ImageIcon(getClass().getResource("/cprefrontend/direction-arrow-right-bottom.png")));
+        bottomRightRotateBtn.addActionListener(this::bottomRightRotateBtnActionPerformed);
+        bottomRightRotateBtn.setEnabled(false);
+        
+        javax.swing.GroupLayout bottomRightSpacePanelLayout = new javax.swing.GroupLayout(bottomRightSpacePanel);
         bottomRightSpacePanel.setLayout(bottomRightSpacePanelLayout);
         bottomRightSpacePanelLayout.setHorizontalGroup(
-                bottomRightSpacePanelLayout.createParallelGroup(GroupLayout.Alignment.LEADING)
+                bottomRightSpacePanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                         .addGap(0, 0, Short.MAX_VALUE)
+                        .addGroup(bottomRightSpacePanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                                .addGroup(bottomRightSpacePanelLayout.createSequentialGroup()
+                                        .addGap(0, 0, Short.MAX_VALUE)
+                                        .addComponent(bottomRightRotateBtn)
+                                        .addGap(0, 0, Short.MAX_VALUE)))
         );
         bottomRightSpacePanelLayout.setVerticalGroup(
-                bottomRightSpacePanelLayout.createParallelGroup(GroupLayout.Alignment.LEADING)
+                bottomRightSpacePanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                         .addGap(0, 0, Short.MAX_VALUE)
+                        .addGroup(bottomRightSpacePanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                                .addGroup(bottomRightSpacePanelLayout.createSequentialGroup()
+                                        .addGap(0, 0, Short.MAX_VALUE)
+                                        .addComponent(bottomRightRotateBtn)
+                                        .addGap(0, 0, Short.MAX_VALUE)))
         );
-
+        
         gridBagConstraints = new GridBagConstraints();
         gridBagConstraints.gridy = 2;
         rotateControlPanel.add(bottomRightSpacePanel, gridBagConstraints);
-
+        
         controlsPanel.add(rotateControlPanel);
-
+        
         logLabel.setFont(new Font("Tahoma", 1, 13)); // NOI18N
         logLabel.setText("Robot Activity Log");
         logLabelPanel.add(logLabel);
-
+        
         log.setEditable(false);
         DefaultCaret caret = (DefaultCaret) log.getCaret();
         caret.setUpdatePolicy(DefaultCaret.ALWAYS_UPDATE);
-
+        
         activityLogScrollPane.setViewportView(log);
-
+        
         GroupLayout logTextFieldPanelLayout = new GroupLayout(logTextFieldPanel);
         logTextFieldPanel.setLayout(logTextFieldPanelLayout);
         logTextFieldPanelLayout.setHorizontalGroup(
@@ -548,7 +622,7 @@ public class Window extends JFrame {
                 logTextFieldPanelLayout.createParallelGroup(GroupLayout.Alignment.LEADING)
                         .addComponent(activityLogScrollPane, GroupLayout.DEFAULT_SIZE, 177, Short.MAX_VALUE)
         );
-
+        
         GroupLayout actionLogPanelLayout = new GroupLayout(actionLogPanel);
         actionLogPanel.setLayout(actionLogPanelLayout);
         actionLogPanelLayout.setHorizontalGroup(
@@ -558,7 +632,7 @@ public class Window extends JFrame {
                                 .addContainerGap()
                                 .addComponent(logLabelPanel, javax.swing.GroupLayout.DEFAULT_SIZE, 302, Short.MAX_VALUE))
         );
-
+        
         actionLogPanelLayout.setVerticalGroup(
                 actionLogPanelLayout.createParallelGroup(GroupLayout.Alignment.LEADING)
                         .addGroup(actionLogPanelLayout.createSequentialGroup()
@@ -566,9 +640,9 @@ public class Window extends JFrame {
                                 .addPreferredGap(LayoutStyle.ComponentPlacement.RELATED)
                                 .addComponent(logTextFieldPanel, GroupLayout.DEFAULT_SIZE, GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
         );
-
+        
         controlsPanel.add(actionLogPanel);
-
+        
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 0;
         gridBagConstraints.gridy = 2;
@@ -578,39 +652,39 @@ public class Window extends JFrame {
         gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHWEST;
         gridBagConstraints.insets = new java.awt.Insets(6, 6, 6, 6);
         contentPanel.add(controlsPanel, gridBagConstraints);
-
+        
         fileMenu.setText("File");
-
+        
         fmNewCalibrationProfileMenuItem.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_N, InputEvent.CTRL_MASK));
         fmNewCalibrationProfileMenuItem.setText("New Calibration Profile");
         fmNewCalibrationProfileMenuItem.addActionListener(this::fmNewCalibrationProfileMenuItemActionPerformed);
         fileMenu.add(fmNewCalibrationProfileMenuItem);
-
+        
         fmLoadCalibrationProfileMenuItem.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_O, InputEvent.CTRL_MASK));
         fmLoadCalibrationProfileMenuItem.setText("Load Calibration Profile");
         fmLoadCalibrationProfileMenuItem.addActionListener(this::fmLoadCalibrationProfileMenuItemActionPerformed);
         fileMenu.add(fmLoadCalibrationProfileMenuItem);
-
+        
         editCalibrationProfileMenuItem.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_E, InputEvent.CTRL_MASK));
         editCalibrationProfileMenuItem.setText("Edit Calibration Profile");
         editCalibrationProfileMenuItem.addActionListener(this::editCalibrationProfileMenuItemActionPerformed);
         fileMenu.add(editCalibrationProfileMenuItem);
         fileMenu.add(jSeparator1);
-
+        
         exitMenuItem.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_X, InputEvent.CTRL_MASK));
         exitMenuItem.setText("Exit");
         exitMenuItem.addActionListener(this::exitMenuItemActionPerformed);
         fileMenu.add(exitMenuItem);
-
+        
         menuBar.add(fileMenu);
-
+        
         editMenu.setText("Edit");
         menuBar.add(editMenu);
-
+        
         emProfileDirectoryMenuItem.setText("Change Profile Directory");
         emProfileDirectoryMenuItem.addActionListener(this::emProfileDirectoryMenuItemActionPerformed);
         editMenu.add(emProfileDirectoryMenuItem);
-
+        
         runMenu.setText("Run");
         menuBar.add(runMenu);
 
@@ -622,9 +696,9 @@ public class Window extends JFrame {
         rmRestartMenuItem.setText("Restart");
         rmRestartMenuItem.addActionListener(this::rmRestartMenuItemActionPerformed);
         runMenu.add(rmRestartMenuItem);
-
+        
         setJMenuBar(menuBar);
-
+        
         GroupLayout layout = new GroupLayout(getContentPane());
         getContentPane().setLayout(layout);
         layout.setHorizontalGroup(
@@ -635,7 +709,7 @@ public class Window extends JFrame {
                 layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                         .addComponent(contentPanel, javax.swing.GroupLayout.DEFAULT_SIZE, 683, Short.MAX_VALUE)
         );
-
+        
         pack();
 
         // init robot position to center of map
@@ -657,53 +731,53 @@ public class Window extends JFrame {
             }
             log.logPrintln("move" + distance + ";");
             comms.sendLine("move" + distance + ";");
-
+            
             String line = comms.readLine(5000);
-            interpreter.parseResponse(line);
             System.out.println(line); // for dedugging purposes
-
+            interpreter.parseResponse(line);
+            
         } catch (NumberFormatException e) {
             System.err.println("Distance must only contain non-zero numbers");
             JOptionPane.showMessageDialog(this, "Distance may only contain non-zero numbers", "NumberFormatExcpetion", JOptionPane.ERROR_MESSAGE);
         }
     }
-
+    
     private void fmLoadCalibrationProfileMenuItemActionPerformed(ActionEvent evt) {
         FileNameExtensionFilter filter = new FileNameExtensionFilter("Calibration Profiles", "profile");
         JFileChooser fc = new JFileChooser();
         fc.setFileFilter(filter);
         int returnVal = fc.showOpenDialog(this);
-
+        
         if (returnVal == JFileChooser.APPROVE_OPTION) {
             File file = fc.getSelectedFile();
-
+            
             loadProfile(file);
         }
     }
-
+    
     private void editCalibrationProfileMenuItemActionPerformed(ActionEvent evt) {
         FileNameExtensionFilter filter = new FileNameExtensionFilter("Calibration Profiles", "profile");
         JFileChooser fc = new JFileChooser();
         fc.setFileFilter(filter);
         int returnVal = fc.showOpenDialog(this);
-
+        
         if (returnVal == JFileChooser.APPROVE_OPTION) {
             String profileName;
             File file = fc.getSelectedFile();
             Pattern r = Pattern.compile("^([a-z,A-Z]:)?[\\\\,\\/](.+[\\\\,\\/])*(.+)\\.(.+)$");
             Matcher m = r.matcher(file.toString());
-
+            
             profileName = (m.find()) ? m.group(3) : "";
-
+            
             CalibrationDialog cDialog = new CalibrationDialog(this, profileName);
             cDialog.createDialog();
             calibrationProfile = cDialog.getCalibrationProfile();
-
+            
             log.logPrintln("Updated profile" + "\"" + profileName + "\"");
             loadProfile(file);
         }
     }
-
+    
     private void fmNewCalibrationProfileMenuItemActionPerformed(java.awt.event.ActionEvent evt) {
         CalibrationDialog cDialog = new CalibrationDialog(this);
         cDialog.createDialog();
@@ -715,43 +789,44 @@ public class Window extends JFrame {
         log.logPrintln("Created calibration profile \"" + calibrationProfile.getName() + "\"");
         loadProfile(calibrationProfile);
     }
-
+    
     private void exitMenuItemActionPerformed(ActionEvent evt) {
         System.exit(0);
     }
-
+    
     private void emProfileDirectoryMenuItemActionPerformed(ActionEvent evt) {
-
+        
     }
-
+    
     private void rmRestartMenuItemActionPerformed(ActionEvent evt) {
         try {
             log.clear();
-
+            
             comms.closeSocket(); // close connection
             log.logPrintln("Socket closed");
-
+            
             calibrationLabel.setText("Calibration Profile: No Profile Selected");
             calibrationLabel.setForeground(Color.red);
             calibrationProfile.setOffset(0);
             calibrationProfile.setMultiplier(1);
             calibrationProfile.setName(null);
             log.logPrintln("Unloaded calibration data");
-
+            
             scanBtn.setEnabled(false);
             moveBtn.setEnabled(false);
             topRotateBtn.setEnabled(false);
             rightRotateBtn.setEnabled(false);
             bottomRotateBtn.setEnabled(false);
             leftRotateBtn.setEnabled(false);
+            musicBtn.setEnabled(false);
         } catch (IOException ex) {
             ex.printStackTrace();
         }
     }
-
+    
     private void connectBtnActionPerformed(ActionEvent evt) {
         if (comms.getSocket() != null && !comms.getSocket().isClosed()) {
-
+            
             try {
                 int result = JOptionPane.showConfirmDialog(this, "Are you sure you want to disconnect?", "Disconnect", JOptionPane.YES_NO_OPTION);
                 if (result == 0) {
@@ -777,7 +852,7 @@ public class Window extends JFrame {
             }
         }
     }
-
+    
     private void scanBtnActionPerformed(ActionEvent evt) throws NumberFormatException {
         log.logPrintln("scan;");
         comms.sendLine("scan;"); // send scan command
@@ -793,6 +868,14 @@ public class Window extends JFrame {
         }
     }
 
+    private void topLeftRotateBtnActionPerformed(ActionEvent evt) {
+        robotOrientationImage.setIcon(new ImageIcon(getClass().getResource("/cprefrontend/robot-orientation-north-west.png")));
+        log.logPrintln("rotate" + getDirection(currentDirection, Robot.NORTH_WEST) + ";");
+        comms.sendLine("rotate" + getDirection(currentDirection, Robot.NORTH_WEST) + ";");
+        currentDirection = Robot.NORTH_WEST;
+        Robot.setDirection(Robot.NORTH_WEST); // use a static method because I want DIRECTION to carry accross all Robot instances
+    }
+    
     private void topRotateBtnActionPerformed(ActionEvent evt) {
         robotOrientationImage.setIcon(new ImageIcon(getClass().getResource("/cprefrontend/robot-orientation-north.png")));
         log.logPrintln("rotate" + getDirection(currentDirection, Robot.NORTH) + ";");
@@ -800,7 +883,15 @@ public class Window extends JFrame {
         currentDirection = Robot.NORTH;
         Robot.setDirection(Robot.NORTH); // use a static method because I want DIRECTION to carry accross all Robot instances
     }
-
+    
+    private void topRightRotateBtnActionPerformed(ActionEvent evt) {
+        robotOrientationImage.setIcon(new ImageIcon(getClass().getResource("/cprefrontend/robot-orientation-north-east.png")));
+        log.logPrintln("rotate" + getDirection(currentDirection, Robot.NORTH_EAST) + ";");
+        comms.sendLine("rotate" + getDirection(currentDirection, Robot.NORTH_EAST) + ";");
+        currentDirection = Robot.NORTH_EAST;
+        Robot.setDirection(Robot.NORTH_EAST); // use a static method because I want DIRECTION to carry accross all Robot instances
+    }
+    
     private void rightRotateBtnActionPerformed(ActionEvent evt) {
         robotOrientationImage.setIcon(new ImageIcon(getClass().getResource("/cprefrontend/robot-orientation-east.png")));
         log.logPrintln("rotate" + getDirection(currentDirection, Robot.EAST) + ";");
@@ -808,7 +899,15 @@ public class Window extends JFrame {
         currentDirection = Robot.EAST;
         Robot.setDirection(Robot.EAST);
     }
-
+    
+    private void bottomRightRotateBtnActionPerformed(ActionEvent evt) {
+        robotOrientationImage.setIcon(new ImageIcon(getClass().getResource("/cprefrontend/robot-orientation-south-east.png")));
+        log.logPrintln("rotate" + getDirection(currentDirection, Robot.SOUTH_EAST) + ";");
+        comms.sendLine("rotate" + getDirection(currentDirection, Robot.SOUTH_EAST) + ";");
+        currentDirection = Robot.SOUTH_EAST;
+        Robot.setDirection(Robot.SOUTH_EAST); // use a static method because I want DIRECTION to carry accross all Robot instances
+    }
+    
     private void bottomRotateBtnActionPerformed(ActionEvent evt) {
         robotOrientationImage.setIcon(new ImageIcon(getClass().getResource("/cprefrontend/robot-orientation-south.png")));
         log.logPrintln("rotate" + getDirection(currentDirection, Robot.SOUTH) + ";");
@@ -816,7 +915,15 @@ public class Window extends JFrame {
         currentDirection = Robot.SOUTH;
         Robot.setDirection(Robot.SOUTH);
     }
-
+    
+    private void bottomLeftRotateBtnActionPerformed(ActionEvent evt) {
+        robotOrientationImage.setIcon(new ImageIcon(getClass().getResource("/cprefrontend/robot-orientation-south-west.png")));
+        log.logPrintln("rotate" + getDirection(currentDirection, Robot.SOUTH_WEST) + ";");
+        comms.sendLine("rotate" + getDirection(currentDirection, Robot.SOUTH_WEST) + ";");
+        currentDirection = Robot.SOUTH_WEST;
+        Robot.setDirection(Robot.SOUTH_WEST);
+    }
+    
     private void leftRotateBtnActionPerformed(ActionEvent evt) {
         robotOrientationImage.setIcon(new ImageIcon(getClass().getResource("/cprefrontend/robot-orientation-west.png")));
         log.logPrintln("rotate" + getDirection(currentDirection, Robot.WEST) + ";");
@@ -824,23 +931,29 @@ public class Window extends JFrame {
         currentDirection = Robot.WEST;
         Robot.setDirection(Robot.WEST);
     }
+    
+    private void musicBtnActionPerformed(ActionEvent evt) {
+        log.logPrintln("play;");
+        comms.sendLine("play;");
+        // enjoy
+    }
     // </editor-fold>
 
     private int getDirection(int cardinalDir0, int cardinalDir1) {
-        int direction = (cardinalDir1 - cardinalDir0) * 90;
-
+        int direction = (cardinalDir1 - cardinalDir0) * 45;
+        
         if (direction < 0) {
             direction += 360;
         }
-
+        
         return direction;
     }
-
+    
     private void loadProfile(File file) {
         try (BufferedReader br = new BufferedReader(new FileReader(file))) {
             StringBuilder sb = new StringBuilder();
             String line = br.readLine();
-
+            
             while (line != null) {
                 sb.append(line);
                 sb.append(",");
@@ -848,7 +961,7 @@ public class Window extends JFrame {
             }
             String[] profile = sb.toString().split(",");
             calibrationProfile.setName(profile[0]);
-
+            
             if (comms.getSocket() != null && !comms.getSocket().isClosed()) {
                 try {
                     calibrationProfile.setOffset(Integer.parseInt(profile[1]));
@@ -862,7 +975,7 @@ public class Window extends JFrame {
             } else {
                 log.logPrintErr("Could not connect to target.");
             }
-
+            
         } catch (FileNotFoundException ex) {
             System.err.println("File not found");
             JOptionPane.showMessageDialog(this, "\"" + file + "\" not found", "FileNotFoundException", JOptionPane.ERROR_MESSAGE);
@@ -871,14 +984,14 @@ public class Window extends JFrame {
             ex.printStackTrace();
         }
     }
-
+    
     protected void loadTestProfile(CalibrationProfile cpf, int status) {
         if (status != 0) {
             Integer offset = cpf.getOffset();
             Integer mult = cpf.getMultiplier();
-
+            
             System.out.println((char) (status + 48) + ", " + offset + ", " + mult);
-
+            
             char c = (char) (status + 48);
             comms.sendLine(c + ";");
             if (status == 1) {
@@ -890,24 +1003,29 @@ public class Window extends JFrame {
 //            loadProfile(cpf);
         }
     }
-
+    
     private void loadProfile(CalibrationProfile cpf) {
         char status = '0';
         int offset = calibrationProfile.getOffset();
         int mult = calibrationProfile.getMultiplier();
-
+        
         comms.sendLine(status + ";");
         comms.sendLine(offset + ";");
         comms.sendLine(mult + ";");
-
+        
         calibrationLabel.setText("Calibration Profile: " + cpf.getName());
         calibrationLabel.setForeground(Color.green);
         scanBtn.setEnabled(true);
+        musicBtn.setEnabled(true);
         moveBtn.setEnabled(true);
         topRotateBtn.setEnabled(true);
         rightRotateBtn.setEnabled(true);
         bottomRotateBtn.setEnabled(true);
         leftRotateBtn.setEnabled(true);
-
+        topLeftRotateBtn.setEnabled(true);
+        topRightRotateBtn.setEnabled(true);
+        bottomLeftRotateBtn.setEnabled(true);
+        bottomRightRotateBtn.setEnabled(true);
+        
     }
 }

@@ -165,6 +165,23 @@ public class Map extends JPanel {
         repaint();
     }
     
+    public void moveRobotInCurrentDirection(int distance) {
+        switch (Robot.getDirection()) {
+            case Robot.NORTH:
+                moveRobot(getCurrentRobotCoords()[0], getCurrentRobotCoords()[1]-distance);
+                break;
+            case Robot.EAST:
+                moveRobot(getCurrentRobotCoords()[0] + distance, getCurrentRobotCoords()[1]);
+                break;
+            case Robot.SOUTH:
+                moveRobot(getCurrentRobotCoords()[0], getCurrentRobotCoords()[1] + distance);
+                break;
+            case Robot.WEST:
+                moveRobot(getCurrentRobotCoords()[0]-distance, getCurrentRobotCoords()[1]);
+                break;
+        }
+    }
+    
     public int[] getCurrentRobotCoords() {
         return r.getPosition();
     }
@@ -185,6 +202,10 @@ public class Map extends JPanel {
     
     public void drawFutureRobotPosition() {
         
+    }
+    
+    public Robot getRobot() {
+        return r;
     }
     
     private void drawGrid(Graphics g, int gridSize) {

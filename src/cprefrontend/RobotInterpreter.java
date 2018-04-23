@@ -5,6 +5,7 @@
  */
 package cprefrontend;
 
+
 /**
  *
  * @author Mike
@@ -12,9 +13,15 @@ package cprefrontend;
 public class RobotInterpreter {
 
     Map map;
+    int[][] linePoints;
+    int pointsIndex;
+    ActivityLog log;
 
-    public RobotInterpreter(Map map) {
+    public RobotInterpreter(Map map, ActivityLog log) {
         this.map = map;
+        linePoints = new int[2][2];
+        pointsIndex = 0;
+        this.log = log;
     }
 
     public void parseResponse(String data) {
@@ -25,9 +32,6 @@ public class RobotInterpreter {
                 break;
             case "move":
                 parseMoveResponse(responseArray);
-                break;
-            case "rotate":
-                parseRotateResponse(responseArray);
                 break;
             default:
                 return;
@@ -40,9 +44,10 @@ public class RobotInterpreter {
             int angleToCenter = (int) Double.parseDouble(arr[2]);
             int diameter = (int) Double.parseDouble(arr[3]);
 
-            if (diameter < 1) {
+            if (diameter < 1 || distToCenter < 4) {
+                log.logErrOverwriteln("There were some issues\nConsider rescanning");
                 return; // dont do anything, this was a fluke
-            } else if (diameter < 9) {
+            } else if (diameter < 8) {
                 diameter = 5;
             } else {
                 diameter = 12;
@@ -56,57 +61,62 @@ public class RobotInterpreter {
     }
 
     private void parseMoveResponse(String[] arr) {
-        int distance;
+        double distance;
         try {
             switch (arr[1]) {
                 case "left":
-                    distance = Integer.parseInt(arr[2]);
-                    map.addObstacle(7, 45, 13);
+                    distance = Double.parseDouble(arr[2]);
+                    distance /= 3.32;
+                    map.moveRobotInCurrentDirection((int)distance);
+                    map.addObstacle(7, 155, 13);
+                    log.logPrintln("DETECTED LEFT BUMP");
                     break;
                 case "right":
-                    distance = Integer.parseInt(arr[2]);
+                    distance = Double.parseDouble(arr[2]);
+                    distance /= 3.32;
+                    map.moveRobotInCurrentDirection((int)distance);
+                    map.addObstacle(12, 25, 13);
+                    log.logPrintln("DETECTED RIGHT BUMP");
                     break;
                 case "line":
-                    distance = Integer.parseInt(arr[2]);
+                    distance = Double.parseDouble(arr[2]);
+                    distance /= 3.32;
+                    linePoints[pointsIndex++] = map.getRobot().getPosition();
+                    if (pointsIndex == 2) {
+                        map.addLine(linePoints[0][0], linePoints[0][1], linePoints[1][0], linePoints[1][1]);
+                        map.repaint();
+                        pointsIndex = 0;
+                    }
+                    log.logPrintln("DETECTED LINE");
                     break;
                 case "cliff":
-                    distance = Integer.parseInt(arr[2]);
+                    distance = Double.parseDouble(arr[2]);
+                    distance /= 3.32;
+                    map.moveRobotInCurrentDirection((int)distance - 6);
+                    log.logPrintln("DETECTED CLIFF");
                     break;
                 default:
-                    distance = Integer.parseInt(arr[1]);
+                    distance = Double.parseDouble(arr[1]);
+                    distance /= 3.32;
+                    map.moveRobotInCurrentDirection((int)distance);
 //                    System.out.println("[" + arr[1] + "]");
-                    switch (Robot.getDirection()) {
-                        case Robot.NORTH:
-                            map.moveRobot(map.getCurrentRobotCoords()[0], map.getCurrentRobotCoords()[1] - distance);
-                            break;
-                        case Robot.EAST:
-                            map.moveRobot(map.getCurrentRobotCoords()[0] + distance, map.getCurrentRobotCoords()[1]);
-                            break;
-                        case Robot.SOUTH:
-                            map.moveRobot(map.getCurrentRobotCoords()[0], map.getCurrentRobotCoords()[1] + distance);
-                            break;
-                        case Robot.WEST:
-                            map.moveRobot(map.getCurrentRobotCoords()[0] - distance, map.getCurrentRobotCoords()[1]);
-                            break;
-                    }
+//                    switch (Robot.getDirection()) {
+//                        case Robot.NORTH:
+//                            map.moveRobot(map.getCurrentRobotCoords()[0], map.getCurrentRobotCoords()[1] - distance);
+//                            break;
+//                        case Robot.EAST:
+//                            map.moveRobot(map.getCurrentRobotCoords()[0] + distance, map.getCurrentRobotCoords()[1]);
+//                            break;
+//                        case Robot.SOUTH:
+//                            map.moveRobot(map.getCurrentRobotCoords()[0], map.getCurrentRobotCoords()[1] + distance);
+//                            break;
+//                        case Robot.WEST:
+//                            map.moveRobot(map.getCurrentRobotCoords()[0] - distance, map.getCurrentRobotCoords()[1]);
+//                            break;
+//                    }
             }
         } catch (NumberFormatException ex) {
             ex.printStackTrace();
-        }
-    }
-
-    private void parseRotateResponse(String[] arr) {
-        switch (arr[1]) {
-            case "0":
-                break;
-            case "90":
-                break;
-            case "180":
-                break;
-            case "270":
-                break;
-            default:
-                break;
         }
     }
 }
