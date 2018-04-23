@@ -39,7 +39,7 @@ public class Map extends JPanel {
             @Override
             public void mousePressed(MouseEvent evt) {
                 mousePt = evt.getPoint();
-                System.out.println(mousePt);
+//                System.out.println(mousePt);
                 repaint();
             }
         });

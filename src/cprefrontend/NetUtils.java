@@ -72,8 +72,8 @@ public class NetUtils extends Thread {
     }
 
     /**
-     * Creates new Socket, BufferedReader, and DataOutputStream for connecting to
-     * a target server, reading incoming data, and writing outgoing data.     * 
+     * Creates new Socket, BufferedReader, and DataOutputStream for connecting
+     * to a target server, reading incoming data, and writing outgoing data. *
      */
     public void createSocket() {
         try {
@@ -84,7 +84,7 @@ public class NetUtils extends Thread {
 
             br = new BufferedReader(new InputStreamReader(socket.getInputStream()));
             os = new DataOutputStream(socket.getOutputStream());
-            
+
         } catch (SocketTimeoutException e) {
             JOptionPane.showMessageDialog(parent, "Connection timed out!\nCheck your IP and port.", "SocketTimeoutException", JOptionPane.ERROR_MESSAGE);
 
@@ -109,10 +109,18 @@ public class NetUtils extends Thread {
         // close socket
         socket.close();
     }
+    
+    public void flushOutputStream() {
+        try {
+            os.flush();
+        } catch (IOException ex) {
+            Logger.getLogger(NetUtils.class.getName()).log(Level.SEVERE, null, ex);
+        }
+    }
 
     /**
      * Sends a String via socket to IP:port
-     * 
+     *
      * @param command String to send
      */
     public void sendLine(String command) {
@@ -125,7 +133,7 @@ public class NetUtils extends Thread {
 
     /**
      * Sends a character via socket to IP:port
-     * 
+     *
      * @param c character to send
      */
     public void sendChar(char c) {
@@ -154,7 +162,7 @@ public class NetUtils extends Thread {
             while ((i = br.read()) != ';') { // ';'
                 char c = (char) i;
                 line += c;
-                System.out.print(c);
+//                System.out.print(c);
             }
 //            System.out.println("here");
         } catch (IOException ex) {

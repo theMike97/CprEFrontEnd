@@ -5,6 +5,8 @@
  */
 package cprefrontend;
 
+import java.util.Arrays;
+
 
 /**
  *
@@ -47,7 +49,7 @@ public class RobotInterpreter {
             if (diameter < 1 || distToCenter < 4) {
                 log.logErrOverwriteln("There were some issues\nConsider rescanning");
                 return; // dont do anything, this was a fluke
-            } else if (diameter < 8) {
+            } else if (diameter < 7) {
                 diameter = 5;
             } else {
                 diameter = 12;
@@ -99,21 +101,6 @@ public class RobotInterpreter {
                     distance = Double.parseDouble(arr[1]);
                     distance /= 3.32;
                     map.moveRobotInCurrentDirection((int)distance);
-//                    System.out.println("[" + arr[1] + "]");
-//                    switch (Robot.getDirection()) {
-//                        case Robot.NORTH:
-//                            map.moveRobot(map.getCurrentRobotCoords()[0], map.getCurrentRobotCoords()[1] - distance);
-//                            break;
-//                        case Robot.EAST:
-//                            map.moveRobot(map.getCurrentRobotCoords()[0] + distance, map.getCurrentRobotCoords()[1]);
-//                            break;
-//                        case Robot.SOUTH:
-//                            map.moveRobot(map.getCurrentRobotCoords()[0], map.getCurrentRobotCoords()[1] + distance);
-//                            break;
-//                        case Robot.WEST:
-//                            map.moveRobot(map.getCurrentRobotCoords()[0] - distance, map.getCurrentRobotCoords()[1]);
-//                            break;
-//                    }
             }
         } catch (NumberFormatException ex) {
             ex.printStackTrace();
