@@ -13,15 +13,9 @@ import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
-import javax.swing.event.DocumentEvent;
-import javax.swing.event.DocumentListener;
 import javax.swing.filechooser.FileNameExtensionFilter;
-import javax.swing.text.BadLocationException;
 import javax.swing.text.DefaultCaret;
 
 /**
@@ -92,6 +86,15 @@ public class Window extends JFrame {
     private JButton bottomLeftRotateBtn;
     private JButton topRightRotateBtn;
     private JButton topLeftRotateBtn;
+    
+    private ImageIcon northWestIcon = new ImageIcon(getClass().getResource("/cprefrontend/robot-orientation-north-west.png"));
+    private ImageIcon northIcon = new ImageIcon(getClass().getResource("/cprefrontend/robot-orientation-north.png"));
+    private ImageIcon northEastIcon = new ImageIcon(getClass().getResource("/cprefrontend/robot-orientation-north-east.png"));
+    private ImageIcon eastIcon = new ImageIcon(getClass().getResource("/cprefrontend/robot-orientation-east.png"));
+    private ImageIcon southIcon = new ImageIcon(getClass().getResource("/cprefrontend/robot-orientation-south.png"));
+    private ImageIcon southEastIcon = new ImageIcon(getClass().getResource("/cprefrontend/robot-orientation-south-east.png"));
+    private ImageIcon southWestIcon = new ImageIcon(getClass().getResource("/cprefrontend/robot-orientation-south-west.png"));
+    private ImageIcon westIcon = new ImageIcon(getClass().getResource("/cprefrontend/robot-orientation-west.png"));
     // End GUI
 
     // Logic
@@ -304,7 +307,7 @@ public class Window extends JFrame {
         scanConnectPanel.setLayout(new FlowLayout(FlowLayout.LEFT));
 
         scanBtn.setText("Scan");
-        scanBtn.setEnabled(false);
+//        scanBtn.setEnabled(false);
         scanBtn.addActionListener(this::scanBtnActionPerformed);
         scanConnectPanel.add(scanBtn);
 
@@ -369,7 +372,7 @@ public class Window extends JFrame {
 
         topRotateBtn.setIcon(new ImageIcon(getClass().getResource("/cprefrontend/direction-arrow-up.png"))); // NOI18N
         topRotateBtn.addActionListener(this::topRotateBtnActionPerformed);
-        topRotateBtn.setEnabled(false);
+//        topRotateBtn.setEnabled(false);
 
         GroupLayout topRotatePanelLayout = new GroupLayout(topRotatePanel);
         topRotatePanel.setLayout(topRotatePanelLayout);
@@ -396,7 +399,7 @@ public class Window extends JFrame {
 
         topRightRotateBtn.setIcon(new javax.swing.ImageIcon(getClass().getResource("/cprefrontend/direction-arrow-right-top.png"))); // NOI18N
         topRightRotateBtn.addActionListener(this::topRightRotateBtnActionPerformed);
-        topRightRotateBtn.setEnabled(false);
+//        topRightRotateBtn.setEnabled(false);
 
         GroupLayout topRightSpacePanelLayout = new GroupLayout(topRightSpacePanel);
         topRightSpacePanel.setLayout(topRightSpacePanelLayout);
@@ -724,22 +727,46 @@ public class Window extends JFrame {
 //        // TODO add your handling code here:
 //    }
     private void moveBtnActionPerformed(ActionEvent evt) {
+        musicBtn.setEnabled(false);
+        scanBtn.setEnabled(false);
+        topRotateBtn.setEnabled(false);
+        rightRotateBtn.setEnabled(false);
+        bottomRotateBtn.setEnabled(false);
+        leftRotateBtn.setEnabled(false);
+        topLeftRotateBtn.setEnabled(false);
+        topRightRotateBtn.setEnabled(false);
+        bottomLeftRotateBtn.setEnabled(false);
+        bottomRightRotateBtn.setEnabled(false);
         try {
             int distance = Integer.parseInt(moveTextField.getText());
+            interpreter.parseResponse("move," + distance);
             if (distance == 0) {
-                throw new NumberFormatException();
+                throw new NumberFormatException("Distance was 0, try again.");
             }
             log.logPrintln("move" + distance + ";");
-            comms.sendLine("move" + distance + ";");
+//            comms.sendLine("move" + distance + ";");
 
-            String line = comms.readLine(5000);
-            System.out.println(line); // for dedugging purposes
+//            String line = comms.readLine(5000);
+//            log.logPrintln(line); // for dedugging purposes
+//            interpreter.parseResponse(line);
+            String line = "move,cliff,14";
             interpreter.parseResponse(line);
 
         } catch (NumberFormatException e) {
             System.err.println("Distance must only contain non-zero numbers");
             JOptionPane.showMessageDialog(this, "Distance may only contain non-zero numbers", "NumberFormatExcpetion", JOptionPane.ERROR_MESSAGE);
         }
+        scanBtn.setEnabled(true);
+        musicBtn.setEnabled(true);
+        moveBtn.setEnabled(true);
+        topRotateBtn.setEnabled(true);
+        rightRotateBtn.setEnabled(true);
+        bottomRotateBtn.setEnabled(true);
+        leftRotateBtn.setEnabled(true);
+        topLeftRotateBtn.setEnabled(true);
+        topRightRotateBtn.setEnabled(true);
+        bottomLeftRotateBtn.setEnabled(true);
+        bottomRightRotateBtn.setEnabled(true);
     }
 
     private void fmLoadCalibrationProfileMenuItemActionPerformed(ActionEvent evt) {
@@ -811,12 +838,20 @@ public class Window extends JFrame {
             calibrationProfile.setMultiplier(1);
             calibrationProfile.setName(null);
             log.logPrintln("Unloaded calibration data");
+            
+            robotOrientationImage.setIcon(northIcon);
+            currentDirection = Robot.NORTH;
+            Robot.setDirection(Robot.NORTH);
 
             scanBtn.setEnabled(false);
             moveBtn.setEnabled(false);
+            topLeftRotateBtn.setEnabled(false);
             topRotateBtn.setEnabled(false);
+            topRightRotateBtn.setEnabled(false);
             rightRotateBtn.setEnabled(false);
+            bottomRightRotateBtn.setEnabled(false);
             bottomRotateBtn.setEnabled(false);
+            bottomLeftRotateBtn.setEnabled(false);
             leftRotateBtn.setEnabled(false);
             musicBtn.setEnabled(false);
         } catch (IOException ex) {
@@ -855,90 +890,119 @@ public class Window extends JFrame {
 
     private void scanBtnActionPerformed(ActionEvent evt) throws NumberFormatException {
         log.logPrintln("scan;");
-        comms.sendLine("scan;"); // send scan command
-        String line;
-        line = comms.readLine(5000); // argument is time in milliseconds | this line gets total number of obstacles
-        log.logPrintln(line);
-        int obstacles=0;
-        try {
-            obstacles = Integer.parseInt(line);
-        } catch (NumberFormatException ex) {
-            try {
-                obstacles = Integer.parseInt(comms.readLine(5000));
-            } catch (NumberFormatException ex1) {
-                System.err.println("you done seriously fucked up");
-                ex1.printStackTrace();
-            }
-        }
-        String[] lines = new String[obstacles];
-        for (int i = 0; i < obstacles; i++) {
-            System.out.println("here");
-            lines[i] = comms.readLine(5000);
-            interpreter.parseResponse(lines[i]);
-            System.out.println(lines[i]); // for debugging purposes
-        }
+        musicBtn.setEnabled(false);
+        moveBtn.setEnabled(false);
+        topRotateBtn.setEnabled(false);
+        rightRotateBtn.setEnabled(false);
+        bottomRotateBtn.setEnabled(false);
+        leftRotateBtn.setEnabled(false);
+        topLeftRotateBtn.setEnabled(false);
+        topRightRotateBtn.setEnabled(false);
+        bottomLeftRotateBtn.setEnabled(false);
+        bottomRightRotateBtn.setEnabled(false);
+//        comms.sendLine("scan;"); // send scan command
+//        String line;
+//        line = comms.readLine(5000); // argument is time in milliseconds | this line gets total number of obstacles
+//        log.logPrintln(line);
+//        System.out.println(line);
+//        int obstacles=0;
+//        try {
+//            obstacles = Integer.parseInt(line);
+//        } catch (NumberFormatException ex) {
+//            try {
+//                obstacles = Integer.parseInt(comms.readLine(5000));
+//            } catch (NumberFormatException ex1) {
+//                System.err.println("you done seriously fucked up");
+//                ex1.printStackTrace();
+//            }
+//        }
+//        String[] lines = new String[obstacles];
+//        for (int i = 0; i < obstacles; i++) {
+////            System.out.println("here");
+//            lines[i] = comms.readLine(5000);
+//            interpreter.parseResponse(lines[i]);
+//            log.logPrintln(lines[i]); // for debugging purposes
+//            System.out.println(lines[i]);
+//        }
+        String line2 = "obstacle,22,90,12";
+        interpreter.parseResponse(line2);
+        line2 = "obstacle,12,30,3";
+        interpreter.parseResponse(line2);
+//        System.out.println(line2);
+        
+        moveBtn.setEnabled(true);
+        musicBtn.setEnabled(true);
+        moveBtn.setEnabled(true);
+        topRotateBtn.setEnabled(true);
+        rightRotateBtn.setEnabled(true);
+        bottomRotateBtn.setEnabled(true);
+        leftRotateBtn.setEnabled(true);
+        topLeftRotateBtn.setEnabled(true);
+        topRightRotateBtn.setEnabled(true);
+        bottomLeftRotateBtn.setEnabled(true);
+        bottomRightRotateBtn.setEnabled(true);
     }
 
     private void topLeftRotateBtnActionPerformed(ActionEvent evt) {
-        robotOrientationImage.setIcon(new ImageIcon(getClass().getResource("/cprefrontend/robot-orientation-north-west.png")));
+        robotOrientationImage.setIcon(northWestIcon);
         log.logPrintln("rotate" + getDirection(currentDirection, Robot.NORTH_WEST) + ";");
-        comms.sendLine("rotate" + getDirection(currentDirection, Robot.NORTH_WEST) + ";");
+//        comms.sendLine("rotate" + getDirection(currentDirection, Robot.NORTH_WEST) + ";");
         currentDirection = Robot.NORTH_WEST;
         Robot.setDirection(Robot.NORTH_WEST); // use a static method because I want DIRECTION to carry accross all Robot instances
     }
 
     private void topRotateBtnActionPerformed(ActionEvent evt) {
-        robotOrientationImage.setIcon(new ImageIcon(getClass().getResource("/cprefrontend/robot-orientation-north.png")));
+        robotOrientationImage.setIcon(northIcon);
         log.logPrintln("rotate" + getDirection(currentDirection, Robot.NORTH) + ";");
-        comms.sendLine("rotate" + getDirection(currentDirection, Robot.NORTH) + ";");
+//        comms.sendLine("rotate" + getDirection(currentDirection, Robot.NORTH) + ";");
         currentDirection = Robot.NORTH;
         Robot.setDirection(Robot.NORTH); // use a static method because I want DIRECTION to carry accross all Robot instances
     }
 
     private void topRightRotateBtnActionPerformed(ActionEvent evt) {
-        robotOrientationImage.setIcon(new ImageIcon(getClass().getResource("/cprefrontend/robot-orientation-north-east.png")));
+        robotOrientationImage.setIcon(northEastIcon);
         log.logPrintln("rotate" + getDirection(currentDirection, Robot.NORTH_EAST) + ";");
-        comms.sendLine("rotate" + getDirection(currentDirection, Robot.NORTH_EAST) + ";");
+//        comms.sendLine("rotate" + getDirection(currentDirection, Robot.NORTH_EAST) + ";");
         currentDirection = Robot.NORTH_EAST;
         Robot.setDirection(Robot.NORTH_EAST); // use a static method because I want DIRECTION to carry accross all Robot instances
     }
 
     private void rightRotateBtnActionPerformed(ActionEvent evt) {
-        robotOrientationImage.setIcon(new ImageIcon(getClass().getResource("/cprefrontend/robot-orientation-east.png")));
+        robotOrientationImage.setIcon(eastIcon);
         log.logPrintln("rotate" + getDirection(currentDirection, Robot.EAST) + ";");
-        comms.sendLine("rotate" + getDirection(currentDirection, Robot.EAST) + ";");
+//        comms.sendLine("rotate" + getDirection(currentDirection, Robot.EAST) + ";");
         currentDirection = Robot.EAST;
         Robot.setDirection(Robot.EAST);
     }
 
     private void bottomRightRotateBtnActionPerformed(ActionEvent evt) {
-        robotOrientationImage.setIcon(new ImageIcon(getClass().getResource("/cprefrontend/robot-orientation-south-east.png")));
+        robotOrientationImage.setIcon(southEastIcon);
         log.logPrintln("rotate" + getDirection(currentDirection, Robot.SOUTH_EAST) + ";");
-        comms.sendLine("rotate" + getDirection(currentDirection, Robot.SOUTH_EAST) + ";");
+//        comms.sendLine("rotate" + getDirection(currentDirection, Robot.SOUTH_EAST) + ";");
         currentDirection = Robot.SOUTH_EAST;
         Robot.setDirection(Robot.SOUTH_EAST); // use a static method because I want DIRECTION to carry accross all Robot instances
     }
 
     private void bottomRotateBtnActionPerformed(ActionEvent evt) {
-        robotOrientationImage.setIcon(new ImageIcon(getClass().getResource("/cprefrontend/robot-orientation-south.png")));
+        robotOrientationImage.setIcon(southIcon);
         log.logPrintln("rotate" + getDirection(currentDirection, Robot.SOUTH) + ";");
-        comms.sendLine("rotate" + getDirection(currentDirection, Robot.SOUTH) + ";");
+//        comms.sendLine("rotate" + getDirection(currentDirection, Robot.SOUTH) + ";");
         currentDirection = Robot.SOUTH;
         Robot.setDirection(Robot.SOUTH);
     }
 
     private void bottomLeftRotateBtnActionPerformed(ActionEvent evt) {
-        robotOrientationImage.setIcon(new ImageIcon(getClass().getResource("/cprefrontend/robot-orientation-south-west.png")));
+        robotOrientationImage.setIcon(southWestIcon);
         log.logPrintln("rotate" + getDirection(currentDirection, Robot.SOUTH_WEST) + ";");
-        comms.sendLine("rotate" + getDirection(currentDirection, Robot.SOUTH_WEST) + ";");
+//        comms.sendLine("rotate" + getDirection(currentDirection, Robot.SOUTH_WEST) + ";");
         currentDirection = Robot.SOUTH_WEST;
         Robot.setDirection(Robot.SOUTH_WEST);
     }
 
     private void leftRotateBtnActionPerformed(ActionEvent evt) {
-        robotOrientationImage.setIcon(new ImageIcon(getClass().getResource("/cprefrontend/robot-orientation-west.png")));
+        robotOrientationImage.setIcon(westIcon);
         log.logPrintln("rotate" + getDirection(currentDirection, Robot.WEST) + ";");
-        comms.sendLine("rotate" + getDirection(currentDirection, Robot.WEST) + ";");
+//        comms.sendLine("rotate" + getDirection(currentDirection, Robot.WEST) + ";");
         currentDirection = Robot.WEST;
         Robot.setDirection(Robot.WEST);
     }

@@ -46,11 +46,13 @@ public class RobotInterpreter {
             int angleToCenter = (int) Double.parseDouble(arr[2]);
             int diameter = (int) Double.parseDouble(arr[3]);
 
-            if (diameter < 1 || distToCenter < 4) {
+            if (diameter < 3 || distToCenter < 4 || distToCenter > 50) {
                 log.logErrOverwriteln("There were some issues\nConsider rescanning");
                 return; // dont do anything, this was a fluke
-            } else if (diameter < 7) {
+            } else if (diameter < 5) {
                 diameter = 5;
+            } else if (diameter < 8) {
+                diameter = 10;
             } else {
                 diameter = 12;
             }
@@ -84,17 +86,18 @@ public class RobotInterpreter {
                     distance = Double.parseDouble(arr[2]);
                     distance /= 3.32;
                     linePoints[pointsIndex++] = map.getRobot().getPosition();
-                    if (pointsIndex == 2) {
-                        map.addLine(linePoints[0][0], linePoints[0][1], linePoints[1][0], linePoints[1][1]);
-                        map.repaint();
-                        pointsIndex = 0;
-                    }
+//                    if (pointsIndex == 2) {
+//                        map.addLine(linePoints[0][0], linePoints[0][1], linePoints[1][0], linePoints[1][1]);
+////                        map.repaint();
+//                        pointsIndex = 0;
+//                    }
                     log.logPrintln("DETECTED LINE");
                     break;
                 case "cliff":
                     distance = Double.parseDouble(arr[2]);
                     distance /= 3.32;
-                    map.moveRobotInCurrentDirection((int)distance - 6);
+                    map.moveRobotInCurrentDirection((int)distance);
+                    map.addCliff();
                     log.logPrintln("DETECTED CLIFF");
                     break;
                 default:
