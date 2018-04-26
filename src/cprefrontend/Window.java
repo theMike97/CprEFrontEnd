@@ -45,6 +45,7 @@ public class Window extends JFrame {
     private JMenuItem emProfileDirectoryMenuItem;
     private JMenuItem exitMenuItem;
     private JMenu fileMenu;
+    private JButton graphicsClearBtn;
     private JMenuItem fmLoadCalibrationProfileMenuItem;
     private JMenuItem fmNewCalibrationProfileMenuItem;
     private JLabel robotOrientationImage;
@@ -104,6 +105,10 @@ public class Window extends JFrame {
     private RobotInterpreter interpreter;
 
     private int currentDirection;
+
+    /**
+     * CalibrationProfile object which contains user-specified calibration information for the robot
+     */
     protected CalibrationProfile calibrationProfile;
     private boolean hasProfile;
     // End Logic
@@ -169,6 +174,7 @@ public class Window extends JFrame {
         connectBtnPanel = new JPanel();
         connectBtn = new JButton();
         scanBtn = new JButton();
+        graphicsClearBtn = new JButton();
         frame = this;
         musicBtn = new JButton();
 
@@ -310,6 +316,11 @@ public class Window extends JFrame {
 //        scanBtn.setEnabled(false);
         scanBtn.addActionListener(this::scanBtnActionPerformed);
         scanConnectPanel.add(scanBtn);
+        
+        graphicsClearBtn.setText("Reset map");
+//        graphicsClearBtn.setText(false);
+        graphicsClearBtn.addActionListener(this::graphicsClearActionPerformed);
+        scanConnectPanel.add(graphicsClearBtn);
 
         musicBtn.setText("Play music");
         musicBtn.setEnabled(false);
@@ -1012,6 +1023,24 @@ public class Window extends JFrame {
         comms.sendLine("play;");
         // enjoy
     }
+    
+    private void graphicsClearActionPerformed(ActionEvent evt) {
+        int n = JOptionPane.showOptionDialog(frame, 
+                "Are you sure you want to reset the map?\nThis action cannot be undone.",
+                "Reset map", 
+                JOptionPane.YES_NO_OPTION, 
+                JOptionPane.WARNING_MESSAGE,
+                null,
+                new Object[] {"Yes", "No"},
+                JOptionPane.YES_OPTION
+        );
+        switch (n) {
+            case JOptionPane.YES_OPTION:
+                mapPanel.clear();
+                break;
+            default: break;
+        }
+    }
     // </editor-fold>
 
     private int getDirection(int cardinalDir0, int cardinalDir1) {
@@ -1060,6 +1089,11 @@ public class Window extends JFrame {
         }
     }
 
+    /**
+     * Sends calibration information created by the user to the robot
+     * @param cpf calibration profile which contains calibration information
+     * @param status calibration status used for testing values and actually loading a profile
+     */
     protected void loadTestProfile(CalibrationProfile cpf, int status) {
         if (status != 0) {
             Integer offset = cpf.getOffset();

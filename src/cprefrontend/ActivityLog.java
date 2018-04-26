@@ -20,24 +20,42 @@ import javax.swing.text.StyleContext;
  */
 public class ActivityLog extends JTextPane {
     
+    /**
+     * Constructor calls super constructor
+     */
     public ActivityLog() {
         super();
     }
     
+    /**
+     * Writes text to the log which does not preceed a newline character
+     * @param line text to write
+     */
     public void logWriteln(String line) {
         append(line, 0);
     }
     
+    /**
+     * Overwrites last line with new text
+     * @param line text to write/overwrite
+     */
     public void logOverwriteln(String line) {
         clearLine();
         logPrintln(line);
     }
     
+    /**
+     * Overwrites last line with new error text
+     * @param line error text to write/overwrite
+     */
     public void logErrOverwriteln(String line) {
         clearLine();
         logPrintErr(line);
     }
     
+    /**
+     * Clears the last line of text
+     */
     public void clearLine() {
         try {
             Document doc = getDocument();
@@ -50,6 +68,9 @@ public class ActivityLog extends JTextPane {
         }
     }
     
+    /**
+     * Clears the entire log
+     */
     public void clear() {
         try {
             Document doc = getDocument();
@@ -59,6 +80,10 @@ public class ActivityLog extends JTextPane {
         }
     }
     
+    /**
+     * Prints a line of text to the log (includes newline character)
+     * @param line line of text to print
+     */
     public void logPrintln(String line) {
         if (getDocument().getLength() > 0) {
             logWriteln("\n");
@@ -66,6 +91,10 @@ public class ActivityLog extends JTextPane {
         logWriteln(line);
     }
     
+    /**
+     * Prints a line of error text to the log (includes newline character)
+     * @param err line of error text to print
+     */
     public void logPrintErr(String err) {
         if (getDocument().getLength() > 0) {
             logWriteln("\n");

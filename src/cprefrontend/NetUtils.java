@@ -31,6 +31,11 @@ public class NetUtils extends Thread {
     private DataOutputStream os;
     private ActivityLog log;
 
+    /**
+     * Constructor sets parent JFrame and ActivityLog for interface with the user
+     * @param parent
+     * @param log
+     */
     public NetUtils(JFrame parent, ActivityLog log) {
         this.log = log;
         this.parent = parent;
@@ -40,6 +45,13 @@ public class NetUtils extends Thread {
         port = 0;
     }
 
+    /**
+     * Constructor sets ActivityLog, parent JFrame, IP address and port
+     * @param parent parent window
+     * @param log output ActivityLog
+     * @param ip IP address
+     * @param port port number
+     */
     public NetUtils(JFrame parent, ActivityLog log, String ip, int port) {
         this(parent, log);
         this.ip = ip;
@@ -103,6 +115,9 @@ public class NetUtils extends Thread {
         socket.close();
     }
     
+    /**
+     * Clears the output stream
+     */
     public void flushOutputStream() {
         try {
             os.flush();
@@ -143,7 +158,6 @@ public class NetUtils extends Thread {
      *
      * @param timeout
      * @return String from byte stream
-     * @throws java.net.SocketException
      */
     public String readLine(long timeout) {
 

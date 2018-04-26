@@ -12,7 +12,6 @@ import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseMotionAdapter;
 import java.util.ArrayList;
-import java.util.Arrays;
 import javax.swing.JPanel;
 
 /**
@@ -31,6 +30,10 @@ public class Map extends JPanel {
     private Point mousePt;
     private Point origin;
 
+    /**
+     * Map constructor initializes location ArrayLists for obstacles, cliffs, and lines
+     * Sets up starting origin location for grid
+     */
     public Map() {
         super();
         origin = new Point(0, 0);
@@ -216,12 +219,21 @@ public class Map extends JPanel {
         repaint();
     }
 
+    /**
+     * Moves robot to exact location described by x and y on the map
+     * @param x x position on the map
+     * @param y y position on the map
+     */
     public void moveRobot(int x, int y) { // moves origin since robot is always at origin
         r.setPosition(x, y);
 //        System.out.println(Arrays.toString(r.getPosition()));
         repaint();
     }
 
+    /**
+     * Moves robot a distance described by distance in the direction it is pointing
+     * @param distance distance to move robot
+     */
     public void moveRobotInCurrentDirection(int distance) {
         
         switch (Robot.getDirection()) {
@@ -252,6 +264,10 @@ public class Map extends JPanel {
         }
     }
 
+    /**
+     * Returns robot coordinates
+     * @return
+     */
     public int[] getCurrentRobotCoords() {
         return r.getPosition();
     }
@@ -284,14 +300,22 @@ public class Map extends JPanel {
         return squareCoords;
     }
     
+    /**
+     * Resets all ArrayLists, moves the origin back to (0,0), and resets the robots location
+     */
     public void clear() {
         obstacles.clear();
         cliffs.clear();
         lines.clear();
+        origin.setLocation(new Point(0,0));
         r.setPosition(getWidth() / 2, getHeight() / 2);
         repaint();
     }
 
+    /**
+     * Returns instantiated Robot object
+     * @return r
+     */
     public Robot getRobot() {
         return r;
     }

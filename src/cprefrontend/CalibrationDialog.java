@@ -43,6 +43,10 @@ public class CalibrationDialog extends JDialog {
 
     private String profileName;
 
+    /**
+     * Constructor which calls the super constructor and initialized fields
+     * @param parent parent JFrame
+     */
     public CalibrationDialog(JFrame parent) {
         super(parent, "Create new calibration profile", true);
         window = (Window) parent;
@@ -57,11 +61,19 @@ public class CalibrationDialog extends JDialog {
         }
     }
 
+    /**
+     * Constructor which sets profile name
+     * @param parent parent JFrame
+     * @param profileName name of profile
+     */
     public CalibrationDialog(JFrame parent, String profileName) {
         this(parent);
         this.profileName = profileName;
     }
 
+    /**
+     * Creates JDialog for entering calibration information
+     */
     public void createDialog() {
 
         setDefaultCloseOperation(DISPOSE_ON_CLOSE);
@@ -111,7 +123,7 @@ public class CalibrationDialog extends JDialog {
 //        pack();
         setVisible(true);
     }
-
+    
     private void cancelBtnActionPerformed(ActionEvent evt) {
         dispose();
     }
@@ -163,6 +175,10 @@ public class CalibrationDialog extends JDialog {
         }
     }
 
+    /**
+     * Returns CalibrationProfile object containing calibration information for the robot
+     * @return
+     */
     public CalibrationProfile getCalibrationProfile() {
         return calibrationProfile;
     }

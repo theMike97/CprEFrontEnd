@@ -8,10 +8,8 @@ package cprefrontend;
 import java.awt.BorderLayout;
 import java.awt.Dimension;
 import java.awt.FlowLayout;
-import java.awt.GridBagLayout;
 import java.awt.Point;
 import java.awt.event.ActionEvent;
-import javax.swing.BorderFactory;
 import javax.swing.JButton;
 import javax.swing.JDialog;
 import javax.swing.JFrame;
@@ -38,6 +36,16 @@ public class ConnectionDialog extends JDialog {
     private String ip;
     private int port;
 
+    /**
+     * Constructor which calls super constructor and initializes fields
+     * ipTextField is set to 192.168.1.1
+     * portTextField is set to 288
+     * 
+     * ipTextField is the JTextField which accepts user input for IP address
+     * portTextField is the JTextField which accepts user input for the port number
+     * 
+     * @param parent parent JFrame
+     */
     public ConnectionDialog(JFrame parent) {
         super(parent, "Edit Connection Information", true);
         fieldsPanel = new JPanel();
@@ -61,6 +69,9 @@ public class ConnectionDialog extends JDialog {
         }
     }
 
+    /**
+     * Creates new JDialog for entering connection information
+     */
     public void createDialog() {
         setDefaultCloseOperation(DISPOSE_ON_CLOSE);
 
@@ -108,10 +119,18 @@ public class ConnectionDialog extends JDialog {
         dispose();
     }
 
+    /**
+     * Returns IP address
+     * @return ip
+     */
     protected String getIP() {
         return ip;
     }
 
+    /**
+     * Returns port number
+     * @return port
+     */
     protected int getPort() {
         return port;
     }
