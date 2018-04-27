@@ -43,7 +43,7 @@ public class RobotInterpreter {
                 parseMoveResponse(responseArray);
                 break;
             default:
-                return;
+                break;
         }
     }
 
@@ -77,7 +77,7 @@ public class RobotInterpreter {
             switch (arr[1]) {
                 case "left":
                     distance = Double.parseDouble(arr[2]);
-                    distance /= 3.32;
+                    distance /= 3;
                     map.moveRobotInCurrentDirection((int)distance);
                     map.addObstacle(7, 155, 13);
                     log.logPrintln("DETECTED LEFT BUMP");
@@ -85,7 +85,7 @@ public class RobotInterpreter {
                     break;
                 case "right":
                     distance = Double.parseDouble(arr[2]);
-                    distance /= 3.32;
+                    distance /= 3;
                     map.moveRobotInCurrentDirection((int)distance);
                     map.addObstacle(12, 25, 13);
                     log.logPrintln("DETECTED RIGHT BUMP");
@@ -93,7 +93,7 @@ public class RobotInterpreter {
                     break;
                 case "line":
                     distance = Double.parseDouble(arr[2]);
-                    distance /= 3.32;
+                    distance /= 3;
                     linePoints[pointsIndex++] = map.getRobot().getPosition();
 //                    if (pointsIndex == 2) {
 //                        map.addLine(linePoints[0][0], linePoints[0][1], linePoints[1][0], linePoints[1][1]);
@@ -105,7 +105,7 @@ public class RobotInterpreter {
                     break;
                 case "cliff":
                     distance = Double.parseDouble(arr[2]);
-                    distance /= 3.32;
+                    distance /= 3;
                     map.moveRobotInCurrentDirection((int)distance);
                     map.addCliff();
                     log.logPrintln("DETECTED CLIFF");
@@ -113,7 +113,8 @@ public class RobotInterpreter {
                     break;
                 default:
                     distance = Double.parseDouble(arr[1]);
-                    distance /= 3.32;
+//                    System.out.println(distance);
+                    distance /= 3;
                     map.moveRobotInCurrentDirection((int)distance);
             }
         } catch (NumberFormatException ex) {

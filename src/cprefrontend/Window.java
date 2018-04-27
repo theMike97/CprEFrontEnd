@@ -313,12 +313,12 @@ public class Window extends JFrame {
         scanConnectPanel.setLayout(new FlowLayout(FlowLayout.LEFT));
 
         scanBtn.setText("Scan");
-//        scanBtn.setEnabled(false);
+        scanBtn.setEnabled(false);
         scanBtn.addActionListener(this::scanBtnActionPerformed);
         scanConnectPanel.add(scanBtn);
         
         graphicsClearBtn.setText("Reset map");
-//        graphicsClearBtn.setText(false);
+        graphicsClearBtn.setEnabled(false);
         graphicsClearBtn.addActionListener(this::graphicsClearActionPerformed);
         scanConnectPanel.add(graphicsClearBtn);
 
@@ -383,7 +383,7 @@ public class Window extends JFrame {
 
         topRotateBtn.setIcon(new ImageIcon(getClass().getResource("/cprefrontend/direction-arrow-up.png"))); // NOI18N
         topRotateBtn.addActionListener(this::topRotateBtnActionPerformed);
-//        topRotateBtn.setEnabled(false);
+        topRotateBtn.setEnabled(false);
 
         GroupLayout topRotatePanelLayout = new GroupLayout(topRotatePanel);
         topRotatePanel.setLayout(topRotatePanelLayout);
@@ -410,7 +410,7 @@ public class Window extends JFrame {
 
         topRightRotateBtn.setIcon(new javax.swing.ImageIcon(getClass().getResource("/cprefrontend/direction-arrow-right-top.png"))); // NOI18N
         topRightRotateBtn.addActionListener(this::topRightRotateBtnActionPerformed);
-//        topRightRotateBtn.setEnabled(false);
+        topRightRotateBtn.setEnabled(false);
 
         GroupLayout topRightSpacePanelLayout = new GroupLayout(topRightSpacePanel);
         topRightSpacePanel.setLayout(topRightSpacePanelLayout);
@@ -739,6 +739,7 @@ public class Window extends JFrame {
 //    }
     private void moveBtnActionPerformed(ActionEvent evt) {
         musicBtn.setEnabled(false);
+        graphicsClearBtn.setEnabled(false);
         scanBtn.setEnabled(false);
         topRotateBtn.setEnabled(false);
         rightRotateBtn.setEnabled(false);
@@ -755,19 +756,20 @@ public class Window extends JFrame {
                 throw new NumberFormatException("Distance was 0, try again.");
             }
             log.logPrintln("move" + distance + ";");
-//            comms.sendLine("move" + distance + ";");
+            comms.sendLine("move" + distance + ";");
 
-//            String line = comms.readLine(5000);
-//            log.logPrintln(line); // for dedugging purposes
-//            interpreter.parseResponse(line);
-            String line = "move,cliff,14";
+            String line = comms.readLine(5000);
+            log.logPrintln(line); // for dedugging purposes
             interpreter.parseResponse(line);
+//            String line = "move,cliff,14";
+//            interpreter.parseResponse(line);
 
         } catch (NumberFormatException e) {
             System.err.println("Distance must only contain non-zero numbers");
             JOptionPane.showMessageDialog(this, "Distance may only contain non-zero numbers", "NumberFormatExcpetion", JOptionPane.ERROR_MESSAGE);
         }
         scanBtn.setEnabled(true);
+        graphicsClearBtn.setEnabled(true);
         musicBtn.setEnabled(true);
         moveBtn.setEnabled(true);
         topRotateBtn.setEnabled(true);
@@ -855,6 +857,7 @@ public class Window extends JFrame {
             Robot.setDirection(Robot.NORTH);
 
             scanBtn.setEnabled(false);
+            graphicsClearBtn.setEnabled(false);
             moveBtn.setEnabled(false);
             topLeftRotateBtn.setEnabled(false);
             topRotateBtn.setEnabled(false);
@@ -902,6 +905,7 @@ public class Window extends JFrame {
     private void scanBtnActionPerformed(ActionEvent evt) throws NumberFormatException {
         log.logPrintln("scan;");
         musicBtn.setEnabled(false);
+        graphicsClearBtn.setEnabled(false);
         moveBtn.setEnabled(false);
         topRotateBtn.setEnabled(false);
         rightRotateBtn.setEnabled(false);
@@ -911,37 +915,38 @@ public class Window extends JFrame {
         topRightRotateBtn.setEnabled(false);
         bottomLeftRotateBtn.setEnabled(false);
         bottomRightRotateBtn.setEnabled(false);
-//        comms.sendLine("scan;"); // send scan command
-//        String line;
-//        line = comms.readLine(5000); // argument is time in milliseconds | this line gets total number of obstacles
-//        log.logPrintln(line);
-//        System.out.println(line);
-//        int obstacles=0;
-//        try {
-//            obstacles = Integer.parseInt(line);
-//        } catch (NumberFormatException ex) {
-//            try {
-//                obstacles = Integer.parseInt(comms.readLine(5000));
-//            } catch (NumberFormatException ex1) {
-//                System.err.println("you done seriously fucked up");
-//                ex1.printStackTrace();
-//            }
-//        }
-//        String[] lines = new String[obstacles];
-//        for (int i = 0; i < obstacles; i++) {
-////            System.out.println("here");
-//            lines[i] = comms.readLine(5000);
-//            interpreter.parseResponse(lines[i]);
-//            log.logPrintln(lines[i]); // for debugging purposes
-//            System.out.println(lines[i]);
-//        }
+        comms.sendLine("scan;"); // send scan command
+        String line;
+        line = comms.readLine(5000); // argument is time in milliseconds | this line gets total number of obstacles
+        log.logPrintln(line);
+        System.out.println(line);
+        int obstacles=0;
+        try {
+            obstacles = Integer.parseInt(line);
+        } catch (NumberFormatException ex) {
+            try {
+                obstacles = Integer.parseInt(comms.readLine(5000));
+            } catch (NumberFormatException ex1) {
+                System.err.println("you done seriously fucked up");
+                ex1.printStackTrace();
+            }
+        }
+        String[] lines = new String[obstacles];
+        for (int i = 0; i < obstacles; i++) {
+//            System.out.println("here");
+            lines[i] = comms.readLine(5000);
+            interpreter.parseResponse(lines[i]);
+            log.logPrintln(lines[i]); // for debugging purposes
+            System.out.println(lines[i]);
+        }
         String line2 = "obstacle,22,90,12";
         interpreter.parseResponse(line2);
-        line2 = "obstacle,12,30,3";
-        interpreter.parseResponse(line2);
-//        System.out.println(line2);
+        line = "obstacle,20.7,141.0,12.3";
+        interpreter.parseResponse(line);
+        System.out.println(line2);
         
         moveBtn.setEnabled(true);
+        graphicsClearBtn.setEnabled(true);
         musicBtn.setEnabled(true);
         moveBtn.setEnabled(true);
         topRotateBtn.setEnabled(true);
@@ -957,7 +962,7 @@ public class Window extends JFrame {
     private void topLeftRotateBtnActionPerformed(ActionEvent evt) {
         robotOrientationImage.setIcon(northWestIcon);
         log.logPrintln("rotate" + getDirection(currentDirection, Robot.NORTH_WEST) + ";");
-//        comms.sendLine("rotate" + getDirection(currentDirection, Robot.NORTH_WEST) + ";");
+        comms.sendLine("rotate" + getDirection(currentDirection, Robot.NORTH_WEST) + ";");
         currentDirection = Robot.NORTH_WEST;
         Robot.setDirection(Robot.NORTH_WEST); // use a static method because I want DIRECTION to carry accross all Robot instances
     }
@@ -965,7 +970,7 @@ public class Window extends JFrame {
     private void topRotateBtnActionPerformed(ActionEvent evt) {
         robotOrientationImage.setIcon(northIcon);
         log.logPrintln("rotate" + getDirection(currentDirection, Robot.NORTH) + ";");
-//        comms.sendLine("rotate" + getDirection(currentDirection, Robot.NORTH) + ";");
+        comms.sendLine("rotate" + getDirection(currentDirection, Robot.NORTH) + ";");
         currentDirection = Robot.NORTH;
         Robot.setDirection(Robot.NORTH); // use a static method because I want DIRECTION to carry accross all Robot instances
     }
@@ -973,7 +978,7 @@ public class Window extends JFrame {
     private void topRightRotateBtnActionPerformed(ActionEvent evt) {
         robotOrientationImage.setIcon(northEastIcon);
         log.logPrintln("rotate" + getDirection(currentDirection, Robot.NORTH_EAST) + ";");
-//        comms.sendLine("rotate" + getDirection(currentDirection, Robot.NORTH_EAST) + ";");
+        comms.sendLine("rotate" + getDirection(currentDirection, Robot.NORTH_EAST) + ";");
         currentDirection = Robot.NORTH_EAST;
         Robot.setDirection(Robot.NORTH_EAST); // use a static method because I want DIRECTION to carry accross all Robot instances
     }
@@ -981,7 +986,7 @@ public class Window extends JFrame {
     private void rightRotateBtnActionPerformed(ActionEvent evt) {
         robotOrientationImage.setIcon(eastIcon);
         log.logPrintln("rotate" + getDirection(currentDirection, Robot.EAST) + ";");
-//        comms.sendLine("rotate" + getDirection(currentDirection, Robot.EAST) + ";");
+        comms.sendLine("rotate" + getDirection(currentDirection, Robot.EAST) + ";");
         currentDirection = Robot.EAST;
         Robot.setDirection(Robot.EAST);
     }
@@ -989,7 +994,7 @@ public class Window extends JFrame {
     private void bottomRightRotateBtnActionPerformed(ActionEvent evt) {
         robotOrientationImage.setIcon(southEastIcon);
         log.logPrintln("rotate" + getDirection(currentDirection, Robot.SOUTH_EAST) + ";");
-//        comms.sendLine("rotate" + getDirection(currentDirection, Robot.SOUTH_EAST) + ";");
+        comms.sendLine("rotate" + getDirection(currentDirection, Robot.SOUTH_EAST) + ";");
         currentDirection = Robot.SOUTH_EAST;
         Robot.setDirection(Robot.SOUTH_EAST); // use a static method because I want DIRECTION to carry accross all Robot instances
     }
@@ -997,7 +1002,7 @@ public class Window extends JFrame {
     private void bottomRotateBtnActionPerformed(ActionEvent evt) {
         robotOrientationImage.setIcon(southIcon);
         log.logPrintln("rotate" + getDirection(currentDirection, Robot.SOUTH) + ";");
-//        comms.sendLine("rotate" + getDirection(currentDirection, Robot.SOUTH) + ";");
+        comms.sendLine("rotate" + getDirection(currentDirection, Robot.SOUTH) + ";");
         currentDirection = Robot.SOUTH;
         Robot.setDirection(Robot.SOUTH);
     }
@@ -1005,7 +1010,7 @@ public class Window extends JFrame {
     private void bottomLeftRotateBtnActionPerformed(ActionEvent evt) {
         robotOrientationImage.setIcon(southWestIcon);
         log.logPrintln("rotate" + getDirection(currentDirection, Robot.SOUTH_WEST) + ";");
-//        comms.sendLine("rotate" + getDirection(currentDirection, Robot.SOUTH_WEST) + ";");
+        comms.sendLine("rotate" + getDirection(currentDirection, Robot.SOUTH_WEST) + ";");
         currentDirection = Robot.SOUTH_WEST;
         Robot.setDirection(Robot.SOUTH_WEST);
     }
@@ -1013,7 +1018,7 @@ public class Window extends JFrame {
     private void leftRotateBtnActionPerformed(ActionEvent evt) {
         robotOrientationImage.setIcon(westIcon);
         log.logPrintln("rotate" + getDirection(currentDirection, Robot.WEST) + ";");
-//        comms.sendLine("rotate" + getDirection(currentDirection, Robot.WEST) + ";");
+        comms.sendLine("rotate" + getDirection(currentDirection, Robot.WEST) + ";");
         currentDirection = Robot.WEST;
         Robot.setDirection(Robot.WEST);
     }
@@ -1125,6 +1130,7 @@ public class Window extends JFrame {
         calibrationLabel.setText("Calibration Profile: " + cpf.getName());
         calibrationLabel.setForeground(Color.green);
         scanBtn.setEnabled(true);
+        graphicsClearBtn.setEnabled(true);
         musicBtn.setEnabled(true);
         moveBtn.setEnabled(true);
         topRotateBtn.setEnabled(true);

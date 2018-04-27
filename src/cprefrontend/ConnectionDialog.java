@@ -24,14 +24,14 @@ import javax.swing.JTextField;
  */
 public class ConnectionDialog extends JDialog {
 
-    private JPanel fieldsPanel;
-    private JPanel buttonsPanel;
-    private JButton okBtn;
-    private JButton cancelBtn;
-    private JTextField ipTextField;
-    private JTextField portTextField;
-    private JLabel ipLabel;
-    private JLabel portLabel;
+    private final JPanel fieldsPanel;
+    private final JPanel buttonsPanel;
+    private final JButton okBtn;
+    private final JButton cancelBtn;
+    private final JTextField ipTextField;
+    private final JTextField portTextField;
+    private final JLabel ipLabel;
+    private final JLabel portLabel;
 
     private String ip;
     private int port;

@@ -12,6 +12,7 @@ import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseMotionAdapter;
 import java.util.ArrayList;
+import java.util.Arrays;
 import javax.swing.JPanel;
 
 /**
@@ -69,9 +70,9 @@ public class Map extends JPanel {
     
     private class Cliff {
         
-        private int x;
-        private int y;
-        private int width;
+        private final int x;
+        private final int y;
+        private final int width;
         
         /**
          * Instantiates new cliff object to provide reference for cliff detection
@@ -146,6 +147,16 @@ public class Map extends JPanel {
             return obs.diameter == this.diameter && obs.dist == this.dist && obs.x == this.x && obs.y == this.y;
         }
 
+        @Override
+        public int hashCode() {
+            int hash = 7;
+            hash = 97 * hash + this.x;
+            hash = 97 * hash + this.y;
+            hash = 97 * hash + this.diameter;
+            hash = 97 * hash + this.dist;
+            return hash;
+        }
+
     }
 
     private class Line { // not static because robot direction can change
@@ -177,6 +188,16 @@ public class Map extends JPanel {
             }
             Line line = (Line) o;
             return line.x1 == this.x1 && line.x2 == this.x2 && line.y1 == this.y1 && line.y2 == this.y2;
+        }
+
+        @Override
+        public int hashCode() {
+            int hash = 3;
+            hash = 31 * hash + this.x1;
+            hash = 31 * hash + this.y1;
+            hash = 31 * hash + this.x2;
+            hash = 31 * hash + this.y2;
+            return hash;
         }
 
     }
@@ -235,10 +256,12 @@ public class Map extends JPanel {
      * @param distance distance to move robot
      */
     public void moveRobotInCurrentDirection(int distance) {
-        
+//        System.out.println(distance);
         switch (Robot.getDirection()) {
             case Robot.NORTH:
+                System.out.println(Arrays.toString(getCurrentRobotCoords()));
                 moveRobot(getCurrentRobotCoords()[0], getCurrentRobotCoords()[1] - distance);
+                System.out.println(Arrays.toString(getCurrentRobotCoords()));
                 break;
             case Robot.NORTH_EAST:
                 moveRobot(getCurrentRobotCoords()[0] + (int) (Math.sin(Math.PI / 4) * distance), getCurrentRobotCoords()[1] - (int) (Math.sin(Math.PI / 4) * distance));
