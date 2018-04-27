@@ -1,6 +1,9 @@
 # Compiled class file
 *.class
 
+# HTML files
+*.html
+
 # XML files
 *.xml
 
@@ -28,7 +31,8 @@
 hs_err_pid*
 
 # Directories
+/dist/
 /build/
 /nbproject/
 /src/planner/
-/src/testClient
+/src/testClient/
